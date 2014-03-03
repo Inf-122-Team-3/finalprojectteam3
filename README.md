@@ -5,3 +5,4 @@ Informatics 122 Final Project
 
 Ariel
 Eric
+Richmond Chang
