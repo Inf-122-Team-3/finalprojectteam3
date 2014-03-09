@@ -1,5 +1,9 @@
 package Model;
 
+/**
+ * A simple Message class for communicating with the Client
+ *
+ */
 public class Message {
 	
 	private String content;
