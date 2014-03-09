@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import Game.GameFactory;
 import Game.GameInstance;
@@ -25,6 +26,8 @@ public class ModelTest {
 		players.add(p1);
 		players.add(p2);
 		GameInstance i = f.createGame(players);
+		for(Player p : players)
+			System.out.println("Player - " + p.getUsername() + " has entered");
 		printModel(i.getModel());
 		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		Player p = p1;
@@ -39,14 +42,29 @@ public class ModelTest {
 				}
 				else if(commands[0].equals("click"))
 				{
-					int x = Integer.parseInt(commands[1]);
-					int y = Integer.parseInt(commands[2]);
-					printModel(i.update(x, y, p));
+					try{
+						int x = Integer.parseInt(commands[1]);
+						int y = Integer.parseInt(commands[2]);
+						printModel(i.update(x, y, p));
+					}
+					catch(Exception e){
+						System.out.println("error processing command");
+					}
 				}
 				else if(commands[0].equals("player"))
 				{
-					int num = Integer.parseInt(commands[1]);
-					p = players.get(num);
+					try{
+						int num = Integer.parseInt(commands[1]);
+						p = players.get(num);
+						System.out.println("swapped to player - " + p.getUsername());
+					}
+					catch(Exception e){
+						System.out.println("error processing command");
+					}
+				}
+				else if(commands[0].equals("help"))
+				{
+					System.out.println("type click [x] [y]");
 				}
 			}
 		}
@@ -68,9 +86,10 @@ public class ModelTest {
 			}
 			System.out.println();
 		}
-		for(Message message : m.getMessages())
+		for(Entry<Player, List<Message>> e : m.getAllMessages().entrySet())
 		{
-			System.out.println(message.getContent());
+			for(Message message : e.getValue())
+				System.out.println(e.getKey().getUsername() + " : " + message.getContent());
 		}
 		m.clearMessages();
 	}

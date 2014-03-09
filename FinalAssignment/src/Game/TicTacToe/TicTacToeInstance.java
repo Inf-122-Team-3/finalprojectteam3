@@ -25,22 +25,25 @@ public class TicTacToeInstance extends GameInstance{
 	@Override
 	public void onPlayerClick(int x, int y, Player p) {
 		Model m = getModel();
-		if(p.equals(getPlayers().get(turn)))
+		if(turn>=0&&turn<getPlayers().size()&&p.equals(getPlayers().get(turn)))
 		{
 			GameObject o = m.getBoard().getObjectAtLocation(x, y);
 			if(o==null){
 				m.getBoard().setObjectAtLocation(x, y, new TicTacToeObject(turn==0 ? "X" : "O"));
-				if(++turn>=getPlayers().size())
-					turn = 0;
 				if(checkThreeInARow(x, y)){
-					m.addMessage(new Message("you won!"));
+					m.addMessage(new Message("you won!"), getPlayers().get(turn));
+					for(int i = 0; i < getPlayers().size(); i++)
+						if(i!=turn)
+							m.addMessage(new Message("you lost!"), getPlayers().get(turn));
 					turn = -1;
 				}
+				if(++turn>=getPlayers().size())
+					turn = 0;
 			}
 		}
 		else
 		{
-			getModel().addMessage(new Message("it's not you're turn"));
+			getModel().addMessage(new Message("it's not you're turn"), p);
 		}
 	}
 	
