@@ -9,10 +9,6 @@ import java.net.UnknownHostException;
 public class ClientRunnable {
 
 	public static void main(String[] args) {
-		//List<Players> listOfPlayers;
-		//List<Players> pendingPlayers;
-		//List<Players> inGamePlayers;
-
 		String hostName = "0.0.0.0";	//localhost	
 		int portNumber = 8080;			//default port
 
