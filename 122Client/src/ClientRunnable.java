@@ -9,25 +9,25 @@ import java.net.UnknownHostException;
 public class ClientRunnable {
 
 	public static void main(String[] args) {
-		final int PORT = 8080; //default port
-		final String IP = "0.0.0.0";
-		
-		String hostName = IP;
-		int portNumber = PORT;
+		//List<Players> listOfPlayers;
+		//List<Players> pendingPlayers;
+		//List<Players> inGamePlayers;
+
+		String hostName = "0.0.0.0";	//localhost	
+		int portNumber = 8080;			//default port
 
 		try (
 				Socket kkSocket = new Socket(hostName, portNumber);
 				PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(kkSocket.getInputStream()));
+				BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
 				) {
-			BufferedReader stdIn =
-					new BufferedReader(new InputStreamReader(System.in));
+			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 			String fromServer;
 			String fromUser;
 
 			while ((fromServer = in.readLine()) != null) {
 				System.out.println("Server: " + fromServer);
+				out.println("Good game");
 				if (fromServer.equals("Bye."))
 					break;
 
