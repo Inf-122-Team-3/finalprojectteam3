@@ -5,11 +5,20 @@ import java.util.List;
 import Model.Model;
 import Util.Player;
 
+/**
+ * A specific instance of a game. This class will be in charge of constructing an appropriate model,
+ * and performing any logic necessary for it's game to be run
+ *
+ */
 public abstract class GameInstance {
 	
 	private Model model;
 	private List<Player> players;
 	
+	/**
+	 * Constructs a new GameInstance, being played by players
+	 * @param players the Player objects currently playing this game
+	 */
 	public GameInstance(List<Player> players){
 		this.players = players;
 		model = createModel();

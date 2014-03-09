@@ -9,6 +9,11 @@ import Model.Message;
 import Model.Model;
 import Util.Player;
 
+/**
+ * An instance of TicTacToe, this class will be responsible for checking the Rules of TicTacToe,
+ * and updating the model accordingly.
+ *
+ */
 public class TicTacToeInstance extends GameInstance{
 	
 	private int turn;
@@ -25,16 +30,20 @@ public class TicTacToeInstance extends GameInstance{
 	@Override
 	public void onPlayerClick(int x, int y, Player p) {
 		Model m = getModel();
-		if(turn>=0&&turn<getPlayers().size()&&p.equals(getPlayers().get(turn)))
+		if(isPlayersTurn(p))
 		{
 			GameObject o = m.getBoard().getObjectAtLocation(x, y);
 			if(o==null){
 				m.getBoard().setObjectAtLocation(x, y, new TicTacToeObject(turn==0 ? "X" : "O"));
 				if(checkThreeInARow(x, y)){
-					m.addMessage(new Message("you won!"), getPlayers().get(turn));
+					m.addMessage(new Message("you won!"), p);
+					p.setWins(p.getWins()+1);
 					for(int i = 0; i < getPlayers().size(); i++)
 						if(i!=turn)
-							m.addMessage(new Message("you lost!"), getPlayers().get(turn));
+						{
+							m.addMessage(new Message("you lost!"), getPlayers().get(i));
+							getPlayers().get(i).setLosses(getPlayers().get(i).getLosses()+1);
+						}
 					turn = -1;
 				}
 				if(++turn>=getPlayers().size())
@@ -47,26 +56,30 @@ public class TicTacToeInstance extends GameInstance{
 		}
 	}
 	
+	private boolean isPlayersTurn(Player p){
+		return turn>=0&&turn<getPlayers().size()&&p.equals(getPlayers().get(turn));
+	}
+	
 	private boolean checkThreeInARow(int x, int y){
 		return checkDiagonals()||checkHorizontal(y)||checkVertical(x);
 	}
 	
-	public boolean checkDiagonals(){
+	private boolean checkDiagonals(){
 		GameObject[][] grid = getModel().getBoard().getGrid();
 		return isSame(grid[0][0], grid[1][1], grid[2][2])||isSame(grid[2][0], grid[1][1], grid[0][2]);
 	}
 	
-	public boolean checkHorizontal(int y){
+	private boolean checkHorizontal(int y){
 		GameObject[][] grid = getModel().getBoard().getGrid();
 		return isSame(grid[0][y], grid[1][y], grid[2][y]);
 	}
 	
-	public boolean checkVertical(int x){
+	private boolean checkVertical(int x){
 		GameObject[][] grid = getModel().getBoard().getGrid();
 		return isSame(grid[x][0], grid[x][1], grid[x][2]);
 	}
 	
-	public boolean isSame(GameObject... gameObjects){
+	private boolean isSame(GameObject... gameObjects){
 		GameObject o = gameObjects[0];
 		if(o==null)
 			return false;

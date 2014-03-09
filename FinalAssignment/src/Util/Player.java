@@ -6,6 +6,10 @@ public class Player {
 	private int id;
 	private int wins;
 	private int losses;
+	
+	public Player(int id){
+		this.id = id;
+	}
 	public String getUsername() {
 		return username;
 	}
@@ -14,9 +18,6 @@ public class Player {
 	}
 	public int getId() {
 		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
 	}
 	public int getWins() {
 		return wins;
@@ -29,6 +30,17 @@ public class Player {
 	}
 	public void setLosses(int losses) {
 		this.losses = losses;
+	}
+	
+	public boolean equals(Object o)
+	{
+		if(!(o instanceof Player))
+			return false;
+		return equals((Player)o);
+	}
+	
+	public boolean equals(Player p){
+		return id==p.id&&username.equals(p.username);
 	}
 
 }

@@ -18,9 +18,9 @@ public class ModelTest {
 	
 	public static void main(String[] args){
 		GameFactory f = new TicTacToeFactory();
-		Player p1 = new Player();
+		Player p1 = new Player(0);
 		p1.setUsername("test1");
-		Player p2 = new Player();
+		Player p2 = new Player(1);
 		p2.setUsername("test2");
 		List<Player> players = new ArrayList<Player>();
 		players.add(p1);
@@ -29,6 +29,7 @@ public class ModelTest {
 		for(Player p : players)
 			System.out.println("Player - " + p.getUsername() + " has entered");
 		printModel(i.getModel());
+		System.out.println("simulation start, type \"help\" for more information on commands");
 		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		Player p = p1;
 		try{
@@ -36,35 +37,32 @@ public class ModelTest {
 			{
 				String s = r.readLine();
 				String[] commands = s.split(" ");
-				if(commands[0].equals("exit"))
-				{
-					break;
-				}
-				else if(commands[0].equals("click"))
-				{
-					try{
+				try{
+					if(commands[0].equals("exit"))
+					{
+						break;
+					}
+					else if(commands[0].equals("click"))
+					{
 						int x = Integer.parseInt(commands[1]);
 						int y = Integer.parseInt(commands[2]);
 						printModel(i.update(x, y, p));
 					}
-					catch(Exception e){
-						System.out.println("error processing command");
-					}
-				}
-				else if(commands[0].equals("player"))
-				{
-					try{
+					else if(commands[0].equals("player"))
+					{
 						int num = Integer.parseInt(commands[1]);
 						p = players.get(num);
 						System.out.println("swapped to player - " + p.getUsername());
 					}
-					catch(Exception e){
-						System.out.println("error processing command");
+					else if(commands[0].equals("help"))
+					{
+						System.out.println("type \"click [x] [y]\" to perform a \"click\" on location [x] [y]");
+						System.out.println("type \"player [num]\" to swap to player number [num]");
+						System.out.println("type \"exit\" to exit the simulation");
 					}
 				}
-				else if(commands[0].equals("help"))
-				{
-					System.out.println("type click [x] [y]");
+				catch(Exception e){
+					System.out.println("error processing command");
 				}
 			}
 		}
