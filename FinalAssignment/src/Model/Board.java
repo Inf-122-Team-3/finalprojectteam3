@@ -21,5 +21,13 @@ public class Board {
 	public void setObjectAtLocation(int x, int y, GameObject o){
 		grid[x][y] = o;
 	}
+	
+	public int getWidth(){
+		return grid.length;
+	}
+	
+	public int getHeight(){
+		return grid[0].length;
+	}
 
 }

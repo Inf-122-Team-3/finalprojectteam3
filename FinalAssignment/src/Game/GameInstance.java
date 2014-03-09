@@ -1,13 +1,17 @@
 package Game;
 
+import java.util.List;
+
 import Model.Model;
 import Util.Player;
 
 public abstract class GameInstance {
 	
 	private Model model;
+	private List<Player> players;
 	
-	public GameInstance(){
+	public GameInstance(List<Player> players){
+		this.players = players;
 		model = createModel();
 	}
 	
@@ -47,5 +51,9 @@ public abstract class GameInstance {
 	 * @param p the player that left
 	 */
 	public abstract void onPlayerLeave(Player p);
+
+	public List<Player> getPlayers() {
+		return players;
+	}
 
 }
