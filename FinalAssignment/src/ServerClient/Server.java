@@ -16,9 +16,8 @@ import com.google.gson.Gson;
 public class Server implements Runnable
 {
   static final int PORT = 8080; //default port
-
-  //static variables
-  static boolean verbose = true;
+  
+  
 
   //instance variables
   Socket connect;
@@ -121,7 +120,6 @@ public class Server implements Runnable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
     }
   }
   
