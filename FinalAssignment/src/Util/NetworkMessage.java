@@ -16,6 +16,7 @@ public class NetworkMessage {
 	}
 	
 	public NetworkMessage(int id, Model model){
+		setIdPlayer(id);
 		setModel(model);
 		this.commands = new Vector<>();
 	}
@@ -56,5 +57,17 @@ public class NetworkMessage {
 	
 	public void setIdPlayer(int id){
 		this.id_player = id;
+	}
+	
+	public int getIdPlayer(){
+		return this.id_player;
+	}
+	
+	public String toString(){
+		String str = "PLAYER ID = "+this.id_player+"\n";
+		str += "Commands:\n";
+		for(Command c:this.commands)
+			str += "\t"+c.getType()+"  "+c.content+"\n";
+		return str;
 	}
 }

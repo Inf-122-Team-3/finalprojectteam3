@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import Model.Model;
 import Util.Command;
+import Util.IDGenerator;
 import Util.NetworkMessage;
 import Util.Player;
 import Game.GameFactory;
@@ -30,6 +31,9 @@ public class Server implements Runnable
 	Map<Integer, GameInstance> currentGames;
 	Map<Integer, Socket> playerSockets;
    	Socket connect;
+   	BufferedReader in = null;
+   	PrintWriter dataOut = null;
+	
 
 	//constructor
 	public Server(Socket connect) {
@@ -62,14 +66,24 @@ public class Server implements Runnable
 		}
     }
   
-  public void processRequest(String jsonString){ 
+  public void processRequest(String jsonString){
+	  System.out.println("Processing request client "+jsonString);
 	  Gson gson = new Gson();
 	  
-	  NetworkMessage j1 = gson.fromJson(jsonString, NetworkMessage.class);
+	  NetworkMessage msg_client = gson.fromJson(jsonString, NetworkMessage.class);
 	  
-	  Vector<Command> commands = j1.getCommands();
-	  for(Command c: commands)
-		  System.out.println(c.getType()+"   "+c.getContent());
+	  //Vector<Command> commands = j1.getCommands();
+	  for(Command c: msg_client.getCommands()){
+		  if(c.getType().equals("#SIGNIN")){
+			  System.out.println("User "+c.getContent()+" signing in");
+			  
+			  NetworkMessage msg = new NetworkMessage(IDGenerator.getNextID(), null);
+			  msg.addCommand(new Command("#SIGNEDIN", msg.getIdPlayer()));
+			  
+			  dataOut.println(msg.toJson());
+
+		  }		  
+	  }
   
 	  
   }
@@ -78,37 +92,16 @@ public class Server implements Runnable
 	 * run method services each request in a separate thread.
 	 */
 	public void run() {
-		BufferedReader in = null;
-		DataOutputStream dataOut = null;
-
 		try {
-
-			String input, output;
-
+			String input;
 			//get character input stream from client
 			in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
 			//get binary output stream to client (for requested data)
-			dataOut = new DataOutputStream(connect.getOutputStream());
-
-			output = "";
-
-			while((input = in.readLine()) != null){
-				if(input.startsWith("Content-Length")){
-					input = in.readLine();
-					input = in.readLine();
-					break;
-				}
-			}
+			dataOut = new PrintWriter(connect.getOutputStream(), true);
 			
-			processRequest(input);
-
-
-			//send HTTP headers
-			dataOut.writeBytes("HTTP/1.0 200 OK"+"\r\n");
-			dataOut.writeBytes("Content-Type: text/html" + "\r\n");
-			dataOut.writeBytes("Connection: close" + "\r\n");
-			dataOut.writeBytes("Content-length: "+output.length()+"\r\n\r\n");
-			dataOut.writeBytes(output);
+			while((input = in.readLine()) != null){
+				processRequest(input);
+			}
 		}
 		catch (IOException ioe) {
 			System.err.println("Server Error: " + ioe);
@@ -116,7 +109,6 @@ public class Server implements Runnable
 		finally {
 			try {
 				in.close();
-				dataOut.flush();
 				dataOut.close();
 				connect.close();
 			} catch (IOException e) {
