@@ -15,23 +15,18 @@ public class ButtonGrid {
 		grid = new JButton[width][length];
 		for(int y = 0; y < length; y++){
 			for (int x = 0; x < width; x++){
+				
 				grid[x][y] = new JButton("(" + x + "," + y +")");
+				grid[x][y].addActionListener(new ButtonActionListener(x,y));
+				
 				frame.add(grid[x][y]);
 			}
 		}
-		
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();frame.setVisible(true);
-		
-		for(int y = 0; y < length; y++){
-			for (int x = 0; x < width; x++){
-				grid[x][y] = new JButton("(" + x + "," + y +")");
-				frame.add(grid[x][y]);
-			}
-		}
 	}
 	public static void main(String[] args) {
-		new ButtonGrid(3,3);
+		new ButtonGrid(10,10);
 	}
 }
