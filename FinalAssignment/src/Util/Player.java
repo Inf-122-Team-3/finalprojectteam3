@@ -10,6 +10,12 @@ public class Player {
 	public Player(int id){
 		this.id = id;
 	}
+	
+	public Player(int id, String username){
+		this.id = id;
+		setUsername(username);
+	}
+	
 	public String getUsername() {
 		return username;
 	}

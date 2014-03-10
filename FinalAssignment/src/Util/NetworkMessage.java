@@ -21,6 +21,11 @@ public class NetworkMessage {
 		this.commands = new Vector<>();
 	}
 	
+	public NetworkMessage(int id){
+		setIdPlayer(id);
+		this.commands = new Vector<>();
+	}
+	
 	public NetworkMessage(String jsonString){
 		Gson gson = new Gson();
 		  

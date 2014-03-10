@@ -4,15 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
 import Util.Command;
 import Util.NetworkMessage;
+import Util.Player;
+
+import com.google.gson.Gson;
 
 public class ClientRunnable {
 	static String HOSTNAME = "127.0.0.1";	//localhost	
@@ -22,6 +22,7 @@ public class ClientRunnable {
 	Socket kkSocket;
 	PrintWriter out;
 	BufferedReader in;
+	Player player = null;
 	
 	public ClientRunnable(String username){
 		try  {
@@ -48,7 +49,7 @@ public class ClientRunnable {
 	}
 	
 	public static void main(String[] args) {
-		ClientRunnable client = new ClientRunnable("ariel");
+		ClientRunnable client = new ClientRunnable("arielaaaasd2");
 	}
 	
 	public void sendCommand(Vector<Command> commands){
@@ -60,9 +61,31 @@ public class ClientRunnable {
 	
 	
 	public void processMessage(String jsonString){
-		NetworkMessage msg = new NetworkMessage(jsonString);
+		NetworkMessage msg_server = new NetworkMessage(jsonString);
 		
 		System.out.println("Message received from SERVER");
-		System.out.println(msg.toString());
+		System.out.println(msg_server.toString());
+		
+		for(Command c: msg_server.getCommands()){
+			  if(c.getType().equals("#SIGNIN")){
+				  if(!c.getFail()){
+					  Gson gson = new Gson();
+					  this.player = gson.fromJson((String) c.getContent(), Player.class);
+					  System.out.println("SIGNIN SUCESSUFUL ID ="+this.player.getId());
+					  
+					  NetworkMessage to_server = new NetworkMessage(this.player.getId());
+					  to_server.addCommand(new Command("move", "a-b"));
+					  
+					  out.println(to_server.toJson());
+					  
+				  }
+				  else{
+					  System.out.println("Fail: "+c.getContent());
+				  }
+			  }
+			  else{
+				  //System.out.println(c.toString())
+			  }
+		  }	
 	}
 }

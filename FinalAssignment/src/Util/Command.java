@@ -2,11 +2,26 @@ package Util;
 
 public class Command {
 	String type;
-	Object content;
+	String content;
+	boolean fail;
 	
-	public Command(String type, Object cont){
+	public Command(String type, String cont_json){
 		setType(type);
-		setContent(cont);
+		setContent(cont_json);
+	}
+	
+	public Command(String type, String cont_json, boolean fail){
+		setType(type);
+		setContent(cont_json);
+		setFail(fail);
+	}
+	
+	public void setFail(boolean fail){
+		this.fail = fail;
+	}
+	
+	public boolean getFail(){
+		return this.fail;
 	}
 	
 	public String getType(){
@@ -17,11 +32,11 @@ public class Command {
 		this.type = type;
 	}
 	
-	public Object getContent(){
+	public String getContent(){
 		return this.content;
 	}
 	
-	public void setContent(Object cont){
+	public void setContent(String cont){
 		this.content = cont;
 	}
 }
