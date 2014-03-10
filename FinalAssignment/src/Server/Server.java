@@ -1,4 +1,4 @@
-package ServerClient;
+package Server;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -6,21 +6,28 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Vector;
 
 import Model.Model;
+import Util.Command;
+import Util.NetworkMessage;
+import Util.Player;
+import Game.GameFactory;
+import Game.GameInstance;
 
 import com.google.gson.Gson;
 
 public class Server implements Runnable
 {
-
-   
 	static final int PORT = 8080; //default port
-	//static variables
-	static boolean verbose = true;
-	//instance variables
-	Socket connect;
+	
+	Map<Integer, Player> activePlayers;
+	Map<Integer, Player> availablePlayers;
+	Vector<Player> allPlayers;
+	Map<String, GameFactory> gameMap;
+	Map<Integer, GameInstance> currentGames;
+   	Socket connect;
 
 	//constructor
 	public Server(Socket connect) {
@@ -48,20 +55,24 @@ public class Server implements Runnable
 		}
     }
   
-  public void processRequest(){
-	  JsonMessage j = new JsonMessage("ariel", new Model());
-	  ServerCommand c = new ServerCommand("initGame", true);
+  public Vector<Command> processRequest(String jsonString){
+	  /*JsonMessage j = new JsonMessage("ariel", new Model());
+	  Command c = new Command("initGame", true);
 	  j.addCommand(c);
 	  
 	  Gson gson = new Gson();
 	  String json = gson.toJson(j);
+	  */
 	  
+	  Gson gson = new Gson();
 	  
-	  JsonMessage j1 = gson.fromJson(json, JsonMessage.class);
+	  NetworkMessage j1 = gson.fromJson(jsonString, NetworkMessage.class);
 	  
-	  Vector<ServerCommand> commands = j1.getCommands();
-	  for(int i = 0; i < commands.size(); i++)
-		  System.out.println(commands.get(i).type_command+"   "+commands.get(i).content);
+	  Vector<Command> commands = j1.getCommands();
+	  for(Command c: commands)
+		  System.out.println(c.getType()+"   "+c.getContent());
+	  
+	  return j1.getCommands();
 	  
   }
 
@@ -69,33 +80,65 @@ public class Server implements Runnable
 	 * run method services each request in a separate thread.
 	 */
 	public void run() {
-
-		processRequest();
 		BufferedReader in = null;
 		PrintWriter out = null;
 		DataOutputStream dataOut = null;
 
 		try {
 
-			String input;
-			String output;
+			String input, output;
 
 			//get character input stream from client
 			in = new BufferedReader(new InputStreamReader(connect.getInputStream()));
-			//get character output stream to client (for headers)
-			out = new PrintWriter(connect.getOutputStream(), true);
 			//get binary output stream to client (for requested data)
 			dataOut = new DataOutputStream(connect.getOutputStream());
 
 			//Sends on first connect
-			String responseString = "Hello From Server";
-			//dataOut.writeBytes(responseString);
-			out.println(responseString);
+			output = "Hello From Server"+"\r\n\r\n";
 
 			//Waits for commands, put protocol here
-			while((input = in.readLine()) != null) {
-				System.out.println(input);
+			int i = 0;
+			
+			while(in.ready()){
+				input = in.readLine();
+				System.out.println(i+" "+input);
+				input = in.readLine();
 			}
+			
+			//BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			/*StringBuilder stringBuilder = new StringBuilder();
+            char[] charBuffer = new char[128];
+            int bytesRead = -1;
+            //in.r
+            while ((bytesRead = in.read(charBuffer)) > 0) {
+                stringBuilder.append(charBuffer, 0, bytesRead);
+            }
+            
+            System.out.println(stringBuilder);*/
+			/*System.out.println("here "+in.ready());
+			while(in.ready()){
+				input = in.readLine();
+				System.out.println(i+" "+input);
+				input = in.readLine();
+			}*/
+			/*while (in.ready()) {
+				input = in.readLine();
+				System.out.println(i+" "+input);
+				i++;
+				/*if(input.startsWith("Content-Length:")){
+					input = in.readLine();
+					System.out.println("first line: "+input);
+					input = in.readLine();
+					System.out.println("second line: "+input);
+				}*/
+				/*Vector<Command> commands = processRequest(input);
+				
+				for(Command c:commands)
+					System.out.println(c.getType()+"  "+c.getContent());*/
+				
+			//}
+			
+			//System.out.println("After read lines");
 
 			//String currentLine = in.readLine();
 			//String headerLine = currentLine;        
@@ -118,9 +161,11 @@ public class Server implements Runnable
 			//      }
 
 			//send HTTP headers
-			//dataOut.writeBytes("HTTP/1.0 200 OK"+"\r\n");
-			//dataOut.writeBytes("Content-Type: text/html" + "\r\n");
-			//dataOut.writeBytes("Content-length: "+responseString.length()+"\r\n\r\n");
+			dataOut.writeBytes("HTTP/1.0 200 OK"+"\r\n");
+			dataOut.writeBytes("Content-Type: text/html" + "\r\n");
+			dataOut.writeBytes("Connection: close" + "\r\n");
+			dataOut.writeBytes("Content-length: "+output.length()+"\r\n\r\n");
+			dataOut.writeBytes(output);
 		}
 		catch (IOException ioe) {
 			System.err.println("Server Error: " + ioe);
@@ -128,7 +173,6 @@ public class Server implements Runnable
 		finally {
 			try {
 				in.close();
-				out.close();
 				dataOut.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
