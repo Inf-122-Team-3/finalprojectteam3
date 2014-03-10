@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -27,10 +28,16 @@ public class Server implements Runnable
 	Vector<Player> allPlayers;
 	Map<String, GameFactory> gameMap;
 	Map<Integer, GameInstance> currentGames;
+	Map<Integer, Socket> playerSockets;
    	Socket connect;
 
 	//constructor
 	public Server(Socket connect) {
+		this.activePlayers = new HashMap<Integer, Player>();
+		this.availablePlayers = new HashMap<Integer, Player>();
+		this.allPlayers = new Vector<Player>();
+		this.gameMap = new HashMap<String, GameFactory>();
+		this.currentGames = new HashMap<Integer, GameInstance>();
 		this.connect = connect;
 	}
 
@@ -55,15 +62,7 @@ public class Server implements Runnable
 		}
     }
   
-  public Vector<Command> processRequest(String jsonString){
-	  /*JsonMessage j = new JsonMessage("ariel", new Model());
-	  Command c = new Command("initGame", true);
-	  j.addCommand(c);
-	  
-	  Gson gson = new Gson();
-	  String json = gson.toJson(j);
-	  */
-	  
+  public void processRequest(String jsonString){ 
 	  Gson gson = new Gson();
 	  
 	  NetworkMessage j1 = gson.fromJson(jsonString, NetworkMessage.class);
@@ -71,8 +70,7 @@ public class Server implements Runnable
 	  Vector<Command> commands = j1.getCommands();
 	  for(Command c: commands)
 		  System.out.println(c.getType()+"   "+c.getContent());
-	  
-	  return j1.getCommands();
+  
 	  
   }
 
@@ -81,7 +79,6 @@ public class Server implements Runnable
 	 */
 	public void run() {
 		BufferedReader in = null;
-		PrintWriter out = null;
 		DataOutputStream dataOut = null;
 
 		try {
@@ -93,72 +90,18 @@ public class Server implements Runnable
 			//get binary output stream to client (for requested data)
 			dataOut = new DataOutputStream(connect.getOutputStream());
 
-			//Sends on first connect
-			output = "Hello From Server"+"\r\n\r\n";
+			output = "";
 
-			//Waits for commands, put protocol here
-			int i = 0;
-			
-			while(in.ready()){
-				input = in.readLine();
-				System.out.println(i+" "+input);
-				input = in.readLine();
+			while((input = in.readLine()) != null){
+				if(input.startsWith("Content-Length")){
+					input = in.readLine();
+					input = in.readLine();
+					break;
+				}
 			}
 			
-			//BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			/*StringBuilder stringBuilder = new StringBuilder();
-            char[] charBuffer = new char[128];
-            int bytesRead = -1;
-            //in.r
-            while ((bytesRead = in.read(charBuffer)) > 0) {
-                stringBuilder.append(charBuffer, 0, bytesRead);
-            }
-            
-            System.out.println(stringBuilder);*/
-			/*System.out.println("here "+in.ready());
-			while(in.ready()){
-				input = in.readLine();
-				System.out.println(i+" "+input);
-				input = in.readLine();
-			}*/
-			/*while (in.ready()) {
-				input = in.readLine();
-				System.out.println(i+" "+input);
-				i++;
-				/*if(input.startsWith("Content-Length:")){
-					input = in.readLine();
-					System.out.println("first line: "+input);
-					input = in.readLine();
-					System.out.println("second line: "+input);
-				}*/
-				/*Vector<Command> commands = processRequest(input);
-				
-				for(Command c:commands)
-					System.out.println(c.getType()+"  "+c.getContent());*/
-				
-			//}
-			
-			//System.out.println("After read lines");
+			processRequest(input);
 
-			//String currentLine = in.readLine();
-			//String headerLine = currentLine;        
-			//StringTokenizer tokenizer = new StringTokenizer(headerLine);
-			//String httpMethod = tokenizer.nextToken();
-			//String httpQueryString = tokenizer.nextToken();
-
-			//      if (httpMethod.equals("GET")) {
-			//   	    System.out.println("GET request");
-			//		// The test home page
-			//		responseString = 
-			//				"<html><body>" +
-			//						"<form action=\"http://127.0.0.1:8080\" enctype=\"multipart/form-data\" method=\"post\">" +
-			//							"Enter the name <input name=\"file\" type=\"text\"><br>" +
-			//							"<input value=\"Submit\" type=\"submit\"></form>"
-			//			   + "</body></html>";           
-			//      }
-			//      else{//POST
-			//    	  System.out.println("POST request");
-			//      }
 
 			//send HTTP headers
 			dataOut.writeBytes("HTTP/1.0 200 OK"+"\r\n");
@@ -173,7 +116,9 @@ public class Server implements Runnable
 		finally {
 			try {
 				in.close();
+				dataOut.flush();
 				dataOut.close();
+				connect.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

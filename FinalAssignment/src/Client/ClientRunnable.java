@@ -1,13 +1,14 @@
 package Client;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Vector;
 
 import Util.Command;
 import Util.NetworkMessage;
@@ -21,44 +22,17 @@ public class ClientRunnable {
 		int portNumber = 8080;			//default port
 
 		try {
-			sendPost();
+			Vector<Command> commands = new Vector<>();
+			commands.add(new Command("test", "test_content"));
+			sendCommand(commands);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*try (
-				Socket kkSocket = new Socket(hostName, portNumber);
-				PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
-				) {
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			String fromServer;
-			String fromUser;
-
-			while ((fromServer = in.readLine()) != null) {
-				System.out.println("Server: " + fromServer);
-				out.println("Good game");
-				if (fromServer.equals("Bye."))
-					break;
-
-				fromUser = stdIn.readLine();
-				if (fromUser != null) {
-					System.out.println("Client: " + fromUser);
-					out.println(fromUser);
-				}
-			}
-		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host " + hostName);
-			System.exit(1);
-		} catch (IOException e) {
-			System.err.println("Couldn't get I/O for the connection to " +
-					hostName);
-			System.exit(1);
-		}*/
 	}
 	
 	// HTTP POST request
-	static void sendPost() throws Exception {
+	static void sendCommand(Vector<Command> commands) throws Exception {
  		URL obj = new URL(URL_SERVER);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
  
@@ -68,24 +42,19 @@ public class ClientRunnable {
 		con.setRequestProperty("Connection", "close");
 
 		NetworkMessage m = new NetworkMessage();
-		Command c = new Command("move", "a1,a2");
-		m.addCommand(c);
+		m.setCommands(commands);
 		
 		String urlParameters = m.toJson();
  
 		// Send post request
 		con.setDoOutput(true);
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(urlParameters);
-		wr.writeBytes("\r\n\r\n");
-		wr.flush();
-		wr.close();
+		con.connect();
+		
+		PrintWriter out = new PrintWriter(con.getOutputStream(), true);
+		out.println(urlParameters+"\r\n\r\nEOF");		
 				
 		int responseCode = con.getResponseCode();
-		System.out.println("\nSending 'POST' request to URL : " + URL_SERVER);
-		System.out.println("Post parameters : " + urlParameters);
-		System.out.println("Response Code : " + responseCode);
- 
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
@@ -94,10 +63,10 @@ public class ClientRunnable {
 			inputLine = in.readLine();
 			response.append(inputLine);
 		}
+		
 		in.close();
- 
-		//con.disconnect();
-		System.out.println(response.toString());
+		out.close();
+		con.disconnect();
 	}
 	
 	public void initSocket(){
