@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import Model.Message;
 
@@ -32,6 +34,10 @@ public class GameView
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gameFrame.getContentPane().add(gamePanel);
 		gameFrame.getContentPane().add(scorePanel, BorderLayout.LINE_START);
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch(Exception e) { }
+		SwingUtilities.updateComponentTreeUI(gameFrame);
 		gameFrame.pack();
 		gameFrame.setVisible(true);
 
