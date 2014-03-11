@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +19,7 @@ public class GameView
 	private GameGridPanel gamePanel;
 	private ScorePanel scorePanel;
 	
-	public GameView(String[][] board, Map<String, String> state, List<Message> messages)//Should actually take SimplfiedModel
+	public GameView(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
 	{
 		gameFrame = new JFrame();
 		gamePanel = new GameGridPanel(board);
@@ -25,7 +27,7 @@ public class GameView
 		setup(board, state, messages);
 	}
 	
-	private void setup(String[][] board, Map<String, String> state, List<Message> messages)//Should actually take SimplifiedModel
+	private void setup(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
 	{
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gameFrame.getContentPane().add(gamePanel);
@@ -35,7 +37,7 @@ public class GameView
 
 	}
 	
-	public boolean update(String[][] board, Map<String, String> state, List<Message> messages)
+	public boolean update(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
 	{
 		if(gamePanel.update(board) && scorePanel.update(state))
 		{
@@ -46,7 +48,7 @@ public class GameView
 		return false;
 	}
 	
-	//TEST
+	//TEST to be removed
 	public static void main(String[] args) 
 	{
 		int x = 5;
@@ -59,7 +61,9 @@ public class GameView
 				board[i][j] = "Hi";
 			}
 		}
-		GameView hws = new GameView(board);
+		Map<String, String> state = new HashMap<String, String>();
+		List<Message> messages = new ArrayList<Message>();
+		GameView hws = new GameView(board, state, messages);
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			br.readLine();
@@ -78,6 +82,3 @@ public class GameView
 	}
 
 }
-
-
-
