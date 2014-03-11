@@ -78,7 +78,7 @@ public class GameView
 				board[i][j] = i + ", " + j;
 			}
 		}
-		hws.update(board);
+		hws.update(board,state, messages);
 	}
 
 }
