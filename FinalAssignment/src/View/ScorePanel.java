@@ -1,6 +1,7 @@
 package View;
 
 import java.awt.Dimension;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -12,14 +13,20 @@ public class ScorePanel extends JPanel {
 	public static final Integer SCORE_WIDTH = 300;
 	public static final Integer SCORE_HEIGHT = 600;
 	
-	public ScorePanel()
+	public ScorePanel(Map<String, String> state)
 	{
-		setup();
+		setup(state);
 	}
 	
-	private void setup()
+	private void setup(Map<String, String> state)
 	{
 		setPreferredSize(new Dimension(SCORE_WIDTH, SCORE_HEIGHT));
+	}
+	
+	public boolean update(Map<String, String> state)
+	{
+		//TODO: Write the update!
+		return false;
 	}
 	
 	

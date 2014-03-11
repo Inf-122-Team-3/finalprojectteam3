@@ -4,8 +4,12 @@ import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JFrame;
+
+import Model.Message;
 
 public class GameView
 {
@@ -13,15 +17,15 @@ public class GameView
 	private GameGridPanel gamePanel;
 	private ScorePanel scorePanel;
 	
-	public GameView(String[][] board)//Should actually take SimplfiedModel
+	public GameView(String[][] board, Map<String, String> state, List<Message> messages)//Should actually take SimplfiedModel
 	{
 		gameFrame = new JFrame();
 		gamePanel = new GameGridPanel(board);
-		scorePanel = new ScorePanel();
-		setup(board);
+		scorePanel = new ScorePanel(state);
+		setup(board, state, messages);
 	}
 	
-	private void setup(String[][] board)
+	private void setup(String[][] board, Map<String, String> state, List<Message> messages)//Should actually take SimplifiedModel
 	{
 		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		gameFrame.getContentPane().add(gamePanel);
@@ -31,9 +35,9 @@ public class GameView
 
 	}
 	
-	public boolean update(String[][] board)
+	public boolean update(String[][] board, Map<String, String> state, List<Message> messages)
 	{
-		if(gamePanel.update(board))
+		if(gamePanel.update(board) && scorePanel.update(state))
 		{
 			gameFrame.revalidate();
 			gameFrame.repaint();
