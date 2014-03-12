@@ -95,6 +95,11 @@ public class Client {
 		sendCommand(v);
 	}
 	
+
+	public void getListGames(){
+		
+	}
+	
 	public void sendInvite(String game, String opponent){
 		Vector<Command> v = new Vector<>();
 		Vector<String> v2 = new Vector<>();
@@ -104,7 +109,7 @@ public class Client {
 		sendCommand(v);
 	}
 	
-	public void acceptInvite(int codeInvitation){
+	public void respondInvitation(int codeInvitation, Boolean accept){
 		Vector<Command> v = new Vector<>();
 		v.add(new Command("#ACCEPTINVITE", Json.toJson(codeInvitation)));
 		sendCommand(v);
