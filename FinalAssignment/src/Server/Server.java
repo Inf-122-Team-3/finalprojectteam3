@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
@@ -33,6 +34,7 @@ public class Server
    	BufferedReader in = null;
    	PrintWriter dataOut = null;
 	Map<Integer, ServerThread> threads;
+	Gson Json;
 	
 	//constructor
 	public Server() {
@@ -42,6 +44,8 @@ public class Server
 		this.gameMap = new HashMap<String, GameFactory>();
 		this.currentGames = new HashMap<Integer, GameInstance>();
 		this.threads = new HashMap<Integer, ServerThread>();
+		
+		Json = new Gson();
 	}
 
 	/**
@@ -87,21 +91,19 @@ public class Server
 		}
 		
 	    public void processRequest(String jsonString){
-	  	  Gson gson = new Gson();
+	      System.out.println("Message received from client: "+jsonString);
+	  	  NetworkMessage msg_from_client = this.server.Json.fromJson(jsonString, NetworkMessage.class);
+	  	  NetworkMessage msg_to_client = new NetworkMessage();
 	  	  
-	  	  NetworkMessage msg_client = gson.fromJson(jsonString, NetworkMessage.class);
-	  	  
-	  	  for(Command c: msg_client.getCommands()){
+	  	  for(Command c: msg_from_client.getCommands()){
 	  		  if(c.getType().equals("#SIGNIN")){
 	  			  System.out.println("User "+c.getContent()+" signing in");
-	  			  
-	  			  NetworkMessage msg = new NetworkMessage(IDGenerator.getNextID(), null);
 	  			  
 	  			  boolean fail = false;
 	  			  for(Player p: this.server.activePlayers.values()){
 	  				  //user already signed in
 	  				  if(p.getUsername().equals(c.getContent())){
-	  					  msg.addCommand(new Command("#SIGNIN", "Username already in use", true));
+	  					  msg_to_client.addCommand(new Command("#SIGNIN", "Username already in use", true));
 	  					  fail = true;
 	  					  break;
 	  				  }
@@ -110,17 +112,38 @@ public class Server
 	  			  if(!fail){//create a new player
 	  				  Player p = new Player(IDGenerator.getNextID(), (String) c.getContent());
 	  				  
-	  				  msg.addCommand(new Command("#SIGNIN", gson.toJson(p,Player.class)));
+	  				  msg_to_client.addCommand(new Command("#SIGNIN", this.server.Json.toJson(p,Player.class)));
 	  				  
 	  				  server.allPlayers.add(p);
 	  				  server.availablePlayers.put(p.getId(), p);
 	  				  server.activePlayers.put(p.getId(), p);
 	  				  
 	  			  }
+	  		  }
+	  		  else if(c.getType().equals("#INVITE")){
+				  //to implement
+			  }
+			  else if(c.getType().equals("#CLICK")){
+				  //to implement
+			  }
+			  else if(c.getType().equals("#GETAVAILABLEPLAYERS")){
+				  System.out.println("#GETAVAILABLEPLAYERS");
+	  			  
+	  			  NetworkMessage msg = new NetworkMessage(IDGenerator.getNextID(), null);
+	  			  Vector<String> v = new Vector<>();
+	  			  for(Player p: this.server.availablePlayers.values())
+	  				  v.add(p.getUsername());
+
+	  			  msg.addCommand(new Command("#GETAVAILABLEPLAYERS", this.server.Json.toJson(v)));
 	  			  
 	  			  dataOut.println(msg.toJson());
-	  		  }		  
-	  	  }	  
+			  }
+			  else if(c.getType().equals("#ACCEPTINVITE")){
+				  //to implement
+			  }
+	  	  }
+	  	  
+	  	  dataOut.println(msg_to_client.toJson());
 	    }
 		
 		@Override
