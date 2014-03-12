@@ -167,19 +167,19 @@ public class Client {
 	
 	private void startGame(){
 		
-		//view.startGame();
+		//view.startGame(model);
 	}
 	
 	private void updateView(){
 		
 		
-		//view.updateView();
+		//view.updateView(model);
 	}
 	
 	private void setGamesAvailable(Vector<String> v){
 
 		
-		//view.setGames();
+		//view.setGamesAvailable(v);
 	}
 	
 	private void receiveInvitation(String username, String game){
