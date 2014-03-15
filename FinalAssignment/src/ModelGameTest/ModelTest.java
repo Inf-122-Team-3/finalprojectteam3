@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import Game.GameFactory;
 import Game.GameInstance;
 import Game.GameObject;
+import Game.Connect4.Connect4Factory;
 import Game.TicTacToe.TicTacToeFactory;
 import Model.Message;
 import Model.Model;
@@ -138,7 +139,7 @@ public class ModelTest {
 	
 	public static void main(String[] args){
 		//this should be the only line that needs to be changed to test other games
-		GameFactory f = new TicTacToeFactory();
+		GameFactory f = new Connect4Factory();
 		ModelTest t = new ModelTest(f);
 		t.run();
 	}

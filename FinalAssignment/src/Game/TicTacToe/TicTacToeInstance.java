@@ -76,6 +76,12 @@ public class TicTacToeInstance extends XInARowGame{
 		return countLeftSlantDiagonal(x,y)==3||countRightSlantDiagonal(x,y)==3||countHorizontal(x,y)==3||countVertical(x,y)==3;
 	}
 
+	
+	/**
+	 * Removes the given player from the game and alert them that they lost. 
+	 * If there is a remaining player, alert them that they won.
+	 * @param p: the Player that left the game
+	 */
 	@Override
 	public void onPlayerLeave(Player p) {
 		getPlayers().remove(p);
