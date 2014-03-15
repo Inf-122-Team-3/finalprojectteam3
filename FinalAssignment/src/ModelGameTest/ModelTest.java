@@ -24,6 +24,7 @@ public class ModelTest {
 	
 	private GameFactory factory;
 	private List<Player> players;
+	private boolean verbose;
 	
 	public ModelTest(GameFactory factory){
 		this(factory, System.in, System.out);
@@ -75,14 +76,20 @@ public class ModelTest {
 						p = swapPlayer(players, Integer.parseInt(commands[1]), out);
 					else if(commands[0].equals("help"))
 						printHelp(out);
+					else if(commands[0].equals("verbose"))
+						setVerbose(true);
 				}
 				catch(Exception e){
-					out.println("error processing command");
+					if(isVerbose())
+						e.printStackTrace();
+					else
+						out.println("error processing command");
 				}
 			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			if(isVerbose())
+				e.printStackTrace();
 		}
 		finally{
 			try{
@@ -134,6 +141,14 @@ public class ModelTest {
 		GameFactory f = new TicTacToeFactory();
 		ModelTest t = new ModelTest(f);
 		t.run();
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 }

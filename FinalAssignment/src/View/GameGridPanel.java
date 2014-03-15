@@ -29,10 +29,10 @@ public class GameGridPanel extends JPanel
 	private void setup(String[][] board)
 	{
 		setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
-		setLayout(new GridLayout(width, height));
-		for(int i = 0; i < board.length; i++)
+		setLayout(new GridLayout(height, width));
+		for(int j = 0; j < (board.length > 0 ? board[0].length : 0); j++)
 		{
-			for(int j = 0; j < (board.length > 0 ? board[0].length : 0); j++)
+			for(int i = 0; i < board.length; i++)
 			{
 				gameGrid[i][j] = new JButton(board[i][j]);
 				gameGrid[i][j].addActionListener(new TileActionListener(i,j));

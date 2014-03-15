@@ -2,6 +2,7 @@ package Game;
 
 import java.util.List;
 
+import Model.Message;
 import Model.Model;
 import Util.Player;
 
@@ -14,6 +15,7 @@ public abstract class GameInstance {
 	
 	private Model model;
 	private List<Player> players;
+	private boolean gameOver = false;
 	
 	/**
 	 * Constructs a new GameInstance, being played by players
@@ -38,6 +40,34 @@ public abstract class GameInstance {
 	
 	public Model getModel() {
 		return model;
+	}
+	
+	/**
+	 * Sends a message to the given Player, informing him that he has won the Match.
+	 * Also increments his number of wins + 1
+	 * @param p the Player to alert
+	 */
+	public void alertWin(Player p){
+		getModel().addMessage(new Message("you won!"), p);
+		p.setWins(p.getWins()+1);
+	}
+	
+	/**
+	 * Sends a message to the given Player, informing him that he has lost the Match.
+	 * Also increments his number of losses + 1
+	 * @param p the Player to alert
+	 */
+	public void alertLoss(Player p){
+		getModel().addMessage(new Message("you lost!"), p);
+		p.setLosses(p.getLosses()+1);
+	}
+	
+	public boolean isGameOver(){
+		return gameOver;
+	}
+	
+	public void setGameOver(){
+		gameOver = true;
 	}
 	
 	/**

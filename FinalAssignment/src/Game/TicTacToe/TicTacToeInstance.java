@@ -2,8 +2,8 @@ package Game.TicTacToe;
 
 import java.util.List;
 
-import Game.GameInstance;
 import Game.GameObject;
+import Game.XInARowGame;
 import Model.Board;
 import Model.Message;
 import Model.Model;
@@ -14,7 +14,7 @@ import Util.Player;
  * and updating the model accordingly.
  *
  */
-public class TicTacToeInstance extends GameInstance{
+public class TicTacToeInstance extends XInARowGame{
 	
 	private int turn;
 	
@@ -73,80 +73,7 @@ public class TicTacToeInstance extends GameInstance{
 	 * @return whether or not there exists a three in a row around this location
 	 */
 	private boolean checkThreeInARow(int x, int y){
-		return checkDiagonals()||checkHorizontal(y)||checkVertical(x);
-	}
-	
-	/**
-	 * checks the diagonals for three in a row. Since there are only two possible diagonals, this check is the same regardless of inputs
-	 * @return whether or not a 3 in a row exists.
-	 */
-	private boolean checkDiagonals(){
-		GameObject[][] grid = getModel().getBoard().getGrid();
-		return isSame(grid[0][0], grid[1][1], grid[2][2])||isSame(grid[2][0], grid[1][1], grid[0][2]);
-	}
-	
-	/**
-	 * checks if a three in a row exists along the given row
-	 * @param y the vertical location on the grid to check [0-height)
-	 * @return whether or not a 3 in a row exists
-	 */
-	private boolean checkHorizontal(int y){
-		GameObject[][] grid = getModel().getBoard().getGrid();
-		return isSame(grid[0][y], grid[1][y], grid[2][y]);
-	}
-	
-	/**
-	 * checks if a three in a row exists along the given column
-	 * @param x the horizontal location on the grid to check [0-width)
-	 * @return whether or not a 3 in a row exists
-	 */
-	private boolean checkVertical(int x){
-		GameObject[][] grid = getModel().getBoard().getGrid();
-		return isSame(grid[x][0], grid[x][1], grid[x][2]);
-	}
-	
-	/**
-	 * checks to see if all of the given objects are equivalent. If even one of these objects is null or not equivalent, false will be returned
-	 * @param gameObjects a list of Objects to check
-	 * @return whether or not all the given objects are equivalent
-	 */
-	private boolean isSame(GameObject... gameObjects){
-		GameObject o = gameObjects[0];
-		if(o==null)
-			return false;
-		for(int i = 1; i < gameObjects.length; i++){
-			if(gameObjects[i]==null||!gameObjects[i].equals(o))
-				return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Sends a message to the given Player, informing him that he has won the Match.
-	 * Also increments his number of wins + 1
-	 * @param p the Player to alert
-	 */
-	private void alertWin(Player p){
-		getModel().addMessage(new Message("you won!"), p);
-		p.setWins(p.getWins()+1);
-	}
-	
-	/**
-	 * Sends a message to the given Player, informing him that he has lost the Match.
-	 * Also increments his number of losses + 1
-	 * @param p the Player to alert
-	 */
-	private void alertLoss(Player p){
-		getModel().addMessage(new Message("you lost!"), p);
-		p.setLosses(p.getLosses()+1);
-	}
-	
-	private boolean isGameOver(){
-		return turn<0;
-	}
-	
-	private void setGameOver(){
-		turn = -1;
+		return countLeftSlantDiagonal(x,y)==3||countRightSlantDiagonal(x,y)==3||countHorizontal(x,y)==3||countVertical(x,y)==3;
 	}
 
 	@Override
