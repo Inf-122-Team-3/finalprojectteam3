@@ -39,7 +39,7 @@ public abstract class XInARowGame extends GameInstance {
 	public int countRightSlantDiagonal(int x, int y){
 		GameObject[][] grid = getModel().getBoard().getGrid();
 		int startOffset = Math.min(grid.length-x-1, y);
-		int endOffset = Math.min(x, (grid.length > 0 ? grid[0].length : 0)-y);
+		int endOffset = Math.min(x+1, (grid.length > 0 ? grid[0].length : 0)-y);
 		GameObject[] checks = new GameObject[endOffset+startOffset];
 		for(int i = -startOffset, j=0; i <endOffset; i++, j++){
 			checks[j] = grid[x-i][y+i];
