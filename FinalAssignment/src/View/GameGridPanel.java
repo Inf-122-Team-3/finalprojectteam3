@@ -18,15 +18,15 @@ public class GameGridPanel extends JPanel
 	private int width;
 	private int height;
 	
-	public GameGridPanel(String[][] board)
+	public GameGridPanel(String[][] board, ClickListener listener)
 	{
 		width = board.length;
 		height = board.length > 0 ? board[0].length : 0;
 		gameGrid = new JButton[width][height];
-		setup(board);
+		setup(board, listener);
 	}
 	
-	private void setup(String[][] board)
+	private void setup(String[][] board, ClickListener listener)
 	{
 		setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
 		setLayout(new GridLayout(height, width));
@@ -35,7 +35,7 @@ public class GameGridPanel extends JPanel
 			for(int i = 0; i < board.length; i++)
 			{
 				gameGrid[i][j] = new JButton(board[i][j]);
-				gameGrid[i][j].addActionListener(new TileActionListener(i,j));
+				gameGrid[i][j].addActionListener(new TileActionListener(i,j, listener));
 				add(gameGrid[i][j]);
 			}
 		}

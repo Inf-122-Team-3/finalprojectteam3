@@ -21,10 +21,10 @@ public class GameView
 	private GameGridPanel gamePanel;
 	private ScorePanel scorePanel;
 	
-	public GameView(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
+	public GameView(String[][] board, Map<String, String> state, List<Message> messages, ClickListener listener) //Will be replaced w/ SimplifiedModel
 	{
 		gameFrame = new JFrame();
-		gamePanel = new GameGridPanel(board);
+		gamePanel = new GameGridPanel(board, listener);
 		scorePanel = new ScorePanel(state);
 		setup(board, state, messages);
 	}
@@ -67,9 +67,14 @@ public class GameView
 				board[i][j] = "Hi";
 			}
 		}
+		ClickListener listener = new ClickListener(){
+			public void onClick(int x, int y){
+				System.out.println("(" + x + "," + y +")");
+			}
+		};
 		Map<String, String> state = new HashMap<String, String>();
 		List<Message> messages = new ArrayList<Message>();
-		GameView hws = new GameView(board, state, messages);
+		GameView hws = new GameView(board, state, messages, listener);
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			br.readLine();

@@ -7,10 +7,12 @@ public class TileActionListener implements ActionListener
 {
 	private int xCoord;
 	private int yCoord;
-	public TileActionListener(int x, int y)
+	private ClickListener listener;
+	public TileActionListener(int x, int y, ClickListener listener)
 	{
 		xCoord = x;
 		yCoord = y;
+		this.listener = listener;
 	}
 	
 	@Override
@@ -18,7 +20,7 @@ public class TileActionListener implements ActionListener
 		// TODO Auto-generated method stub
 		  //System.out.println("(hello)");
 
-		System.out.println("(" + xCoord + "," + yCoord +")");
+		listener.onClick(xCoord, yCoord);
 		  
 	}
 }
