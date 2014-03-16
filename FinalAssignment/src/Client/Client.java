@@ -45,9 +45,9 @@ public class Client {
 	BufferedReader in;
 	Player player = null;
 	Gson Json;
-	LobbyView view;
+	IGameView view;
 	
-	public Client(String username, LobbyView view){
+	public Client(String username, IGameView view){
 		this.view = view;
 		username = username.toUpperCase();
 		Json = new Gson();
@@ -167,24 +167,24 @@ public class Client {
 	
 	private void startGame(){
 		
-		//view.startGame(model);
+		view.startGame();
 	}
 	
 	private void updateView(){
 		
 		
-		//view.updateView(model);
+		view.updateView();
 	}
 	
 	private void setGamesAvailable(Vector<String> v){
 
 		
-		//view.setGamesAvailable(v);
+		view.setGamesAvailable(v);
 	}
 	
 	private void receiveInvitation(String username, String game){
 		
-		//view.invitation();
+		view.receiveInvitation(username, game);
 	}
 	
 }
