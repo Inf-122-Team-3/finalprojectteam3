@@ -13,7 +13,6 @@ import java.util.Vector;
 import Util.Command;
 import Util.NetworkMessage;
 import Util.Player;
-import View.LobbyView;
 
 import com.google.gson.Gson;
 
@@ -47,12 +46,17 @@ public class Client {
 	Gson Json;
 	IGameView view;
 	
-	public Client(String username, IGameView view){
+	public Client(String username, IGameView view)
+	{
+		this(username, HOSTNAME, PORT, view);
+	}
+	
+	public Client(String username, String hostname, int port, IGameView view){
 		this.view = view;
 		username = username.toUpperCase();
 		Json = new Gson();
 		try  {
-			kkSocket = new Socket(HOSTNAME, PORT);
+			kkSocket = new Socket(hostname, port);
 			out = new PrintWriter(kkSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
 			
@@ -63,10 +67,10 @@ public class Client {
 			new Receptor(in).start();
 			
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host " + HOSTNAME);
+			System.err.println("Don't know about host " + hostname);
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Couldn't get I/O for the connection to " + HOSTNAME);
+			System.err.println("Couldn't get I/O for the connection to " + hostname);
 			System.exit(1);
 		}
 	}
