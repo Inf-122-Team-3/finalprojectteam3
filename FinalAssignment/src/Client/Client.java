@@ -88,7 +88,6 @@ public class Client {
 		System.out.println("sendCommand");
 		NetworkMessage m = new NetworkMessage((this.player != null ? this.player.getId() : -1));
 		m.setCommands(commands);
-
 		out.println(m.toJson());
 	}
 
@@ -127,7 +126,12 @@ public class Client {
 
 	public void click(Point coordinate){
 		Vector<Command> v = new Vector<>();
-		v.add(new Command("#CLICK", Json.toJson(coordinate)));
+		Vector<String> data = new Vector<String>();
+		
+		data.add(Json.toJson(coordinate));
+		data.add(player.getUsername());
+		
+		v.add(new Command("#CLICK", Json.toJson(data)));
 		sendCommand(v);
 	}
 
