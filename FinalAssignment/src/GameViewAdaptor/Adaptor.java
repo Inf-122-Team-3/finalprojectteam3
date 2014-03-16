@@ -6,6 +6,7 @@ import java.util.List;
 import Game.GameFactory;
 import Game.GameInstance;
 import Game.GameObject;
+import Game.Connect4.Connect4Factory;
 import Game.TicTacToe.TicTacToeFactory;
 import Model.Model;
 import Util.Player;
@@ -41,7 +42,7 @@ public class Adaptor {
 	}
 	
 	public static void main(String[] args){
-		new Adaptor(new TicTacToeFactory());
+		new Adaptor(new Connect4Factory());
 	}
 
 }
