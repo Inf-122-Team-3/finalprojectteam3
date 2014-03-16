@@ -13,7 +13,7 @@ import java.util.Vector;
 import Util.Command;
 import Util.NetworkMessage;
 import Util.Player;
-import View.ClientView;
+import View.LobbyView;
 
 import com.google.gson.Gson;
 
@@ -45,9 +45,9 @@ public class Client {
 	BufferedReader in;
 	Player player = null;
 	Gson Json;
-	ClientView view;
+	LobbyView view;
 	
-	public Client(String username, ClientView view){
+	public Client(String username, LobbyView view){
 		this.view = view;
 		username = username.toUpperCase();
 		Json = new Gson();
