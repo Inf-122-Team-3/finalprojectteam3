@@ -27,15 +27,15 @@ public class Adaptor {
 		game = f.createGame(players);
 		Model m = game.getModel();
 		String[][] grid = new String[m.getBoard().getWidth()][m.getBoard().getHeight()];
-		for(int i = 0; i < m.getBoard().getHeight(); i++)
+		for(int i = 0; i < m.getBoard().getWidth(); i++)
 		{
-			for(int j = 0; j < m.getBoard().getWidth(); j++)
+			for(int j = 0; j < m.getBoard().getHeight(); j++)
 			{
-				GameObject o = m.getBoard().getObjectAtLocation(j, i);
+				GameObject o = m.getBoard().getObjectAtLocation(i, j);
 				grid[i][j] = (o==null? "" : o.getRepresentation());
 			}
 		}
-		ModelClickListener l = new ModelClickListener(game, p1);
+		ModelClickListener l = new ModelClickListener(game, p1, p2);
 		view = new GameView(grid, null, m.getMessages(p1), l);
 		l.setView(view);
 	}
