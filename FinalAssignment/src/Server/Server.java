@@ -105,6 +105,7 @@ public class Server
 		}
 	}
 
+	//Starts the server, reads the saved player data, and starts new Listen thread
 	public static void startServer() {
 		try {
 			Server server = new Server();
@@ -129,6 +130,7 @@ public class Server
 		}
 	}
 
+	//Stops the server, and writes all the player data to a txt file in JSON format
 	public static void stopServer() {
 		try {
 			File file = new File("playerData.txt");
@@ -152,6 +154,7 @@ public class Server
 		System.exit(0);
 	}
 
+	//Listen for new connections
 	static public class Listen extends Thread {
 		Server server;
 		ServerSocket serverSocket;
@@ -174,6 +177,7 @@ public class Server
 		}
 	}
 
+	//Thread for each connected client
 	static public class ServerThread extends Thread{
 		Server server;
 		Socket socket;
@@ -341,20 +345,16 @@ public class Server
 							Command command = new Command("#STARTGAME", this.server.Json.toJson(toSendData));
 							msg_to_client.addCommand(command);
 							
-							//new PrintWriter(sendTo.getOutputStream(), true).println(invitiation.toJson());
-							
 							getPlayerSocket(player1.getUsername());
 							getPlayerSocket(player2.getUsername());
 							
 						}
 					}
 					else {
-						//Send message to sender saying user declined
-
+						
 					}
 				}
 			}
-
 			dataOut.println(msg_to_client.toJson());
 		}
 

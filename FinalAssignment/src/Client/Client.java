@@ -8,16 +8,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Vector;
 
 import Game.GameFactory;
-import Model.Model;
 import Util.Command;
 import Util.Invite;
 import Util.NetworkMessage;
 import Util.Player;
 import View.LobbyView;
+import View.Login;
 
 import com.google.gson.Gson;
 
@@ -41,7 +40,7 @@ public class Client {
 			}
 		}
 	}
-	static String HOSTNAME = "127.0.0.1";	//localhost	
+	static String HOSTNAME = "127.0.0.1";	//change host name to ip of the server, use whatismyip.com	
 	static int PORT = 8080;	
 
 	Socket kkSocket;
@@ -49,12 +48,17 @@ public class Client {
 	BufferedReader in;
 	Player player = null;
 	Gson Json;
-	LobbyView view;
-
-	public Client(String username, LobbyView view){
-		this.view = view;
+	LobbyView lobbyView;
+	Login loginView;
+	
+	String[] listOfGames;
+	String[] listOfAvaliablePlayers;
+	
+	public Client(String username, Login loginView) {
+		this.loginView = loginView;
 		username = username.toUpperCase();
 		Json = new Gson();
+		
 		try  {
 			kkSocket = new Socket(HOSTNAME, PORT);
 			out = new PrintWriter(kkSocket.getOutputStream(), true);
@@ -74,16 +78,12 @@ public class Client {
 			System.exit(1);
 		}
 	}
-
-	//Remove, for Testing only
-	public static void main(String[] args) {
-		//testing code
-		Scanner keyboard = new Scanner(System.in);
-		System.out.println("enter an username:");
-		String username = keyboard.nextLine();
-		Client client = new Client(username, null);
+	
+	public void setLobbyView(LobbyView lobbyView)
+	{
+		this.lobbyView = lobbyView;
 	}
-
+	
 	private void sendCommand(Vector<Command> commands){
 		//System.out.println("sendCommand");
 		NetworkMessage m = new NetworkMessage((this.player != null ? this.player.getId() : -1));
@@ -91,23 +91,52 @@ public class Client {
 		out.println(m.toJson());
 	}
 
-	public void getListAvailablePlayers(){
+	private void loadListAvailablePlayers(){
 		System.out.println("getListAvailablePlayers");
 		Vector<Command> v = new Vector<>();
 		v.add(new Command("#GETAVAILABLEPLAYERS", ""));
 		sendCommand(v);
 	}
 
-	public void getListGames(){
+	private void loadListGames(){
 		Vector<Command> v = new Vector<>();
 		v.add(new Command("#GETLISTOFGAMES", ""));
 		sendCommand(v);
 	}
 
-	private void setGamesAvailable(Vector<String> v){
-		//view.setGamesAvailable(v);
+	public String[] getListOFAvaliablePlayers() {
+		return listOfAvaliablePlayers;
+	}
+	
+	public String[] getListOfGames() {
+		return listOfGames;
 	}
 
+	private void updateActivePlayers(Vector<String> v){
+		listOfAvaliablePlayers = new String[v.size()];
+		for(int i = 0; i < v.size(); i++) {
+			listOfAvaliablePlayers[i] = v.get(i);
+			System.out.println(v.get(i));
+		}
+		if(lobbyView != null)
+			lobbyView.updateListOfAvaliablePlayers(listOfAvaliablePlayers);
+		//view.updateActivePlayers(v);
+	}
+	
+	private void updateListOfGames(Vector<String> v) {
+		listOfGames = new String[v.size()];
+		for(int i = 0; i < v.size(); i++) {
+			listOfGames[i] = v.get(i);
+			System.out.println(v.get(i));
+		}
+		if(lobbyView != null)
+			lobbyView.updateListOfGames(listOfGames);
+	}
+	
+	public void refreshListOfPlayers() {
+		loadListAvailablePlayers();
+	}
+	
 	public void sendInvite(String game, String opponent){
 		Vector<Command> v = new Vector<>();
 		Vector<String> v2 = new Vector<>();
@@ -135,13 +164,6 @@ public class Client {
 		sendCommand(v);
 	}
 
-	private void updateActivePlayers(Vector<String> v){
-		System.out.println("Players Available:");
-		for(String s: v)
-			System.out.println(s);
-		//view.updateActivePlayers(v);
-	}
-
 	private void updateView(){
 		//view.updateView(model);
 	}
@@ -153,6 +175,9 @@ public class Client {
 	private void receiveInvitation(String username, String game){
 		System.out.println("Recieved invite from " + username + " for " + game);
 		//view.invitation();
+		if(lobbyView != null) {
+			//Call lobbyview method here to show message 
+		}
 	}
 
 	public void processMessage(String jsonString){
@@ -165,9 +190,16 @@ public class Client {
 				if(!c.getFail()){
 					this.player = Json.fromJson((String) c.getContent(), Player.class);
 					System.out.println("SIGNIN SUCESSUFUL ID ="+this.player.getId());
-					//sendInvite("Game1", "test2");
+					
+					loginView.loadLobbyView();
+					loadListAvailablePlayers();
+					loadListGames();
 				}
 				else{
+					//Pop error messag.
+					if(loginView != null) {
+						loginView.popupMessage(c.getContent());;
+					}
 					System.out.println("Fail: "+c.getContent());
 				}
 			}
@@ -187,6 +219,10 @@ public class Client {
 			else if(c.getType().equals("#GETAVAILABLEPLAYERS")){
 				updateActivePlayers((Vector<String>)(Json.fromJson(c.getContent(), Vector.class)));
 			}
+			//Get list of ongoing games
+			else if(c.getType().equals("#GETLISTOFGAMES")){
+				updateListOfGames((Vector<String>)(Json.fromJson(c.getContent(), Vector.class)));
+			}
 			//Updating game view
 			else if(c.getType().equals("#MODELUPDATED")){
 				updateView();
@@ -201,10 +237,7 @@ public class Client {
 				Invite invite = Json.fromJson(c.getContent(), Invite.class);
 				receiveInvitation(invite.getSenderUsername(), invite.getGame());
 			}
-			//Get list of ongoing games
-			else if(c.getType().equals("#GETLISTGAMES")){
-				setGamesAvailable((Vector<String>)(Json.fromJson(c.getContent(), Vector.class)));
-			}
+			
 		}	
 	}
 }

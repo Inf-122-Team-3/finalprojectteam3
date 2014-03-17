@@ -2,14 +2,18 @@ package View;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
+
+import Client.Client;
 public class Login extends JFrame
 {
 	private JLabel usernameLabel;
 	private JTextField usernameTextField;
 	private JButton submitButton;
 	private JPanel contentPane;
-
+	private Client client;
+	
 	public Login()
 	{
 		super();
@@ -41,7 +45,7 @@ public class Login extends JFrame
 		addComponent(contentPane, usernameTextField, 110,10,183,22);
 		addComponent(contentPane, submitButton, 150,75,83,28);
 		
-		//title
+		//title	
 		this.setTitle("Login");
 		this.setLocation(new Point(76, 182));
 		this.setSize(new Dimension(335, 141));
@@ -58,11 +62,20 @@ public class Login extends JFrame
 
 	private void submitButton_actionPerformed(ActionEvent e)
 	{
-		System.out.println("\nsubmitButton_actionPerformed(ActionEvent e) called.");
+		//System.out.println("\nsubmitButton_actionPerformed(ActionEvent e) called.");
 		String username = new String(usernameTextField.getText());
-
+		client = new Client(username, this);
 	}
-
+	
+	public void loadLobbyView() {
+		LobbyView lobbyView = new LobbyView(client, this);
+		client.setLobbyView(lobbyView);
+		this.dispose();
+	}
+	
+	public void popupMessage(String message) {
+		JOptionPane.showMessageDialog(this, message);
+	}
 
 	public static void main(String[] args)
 	{
