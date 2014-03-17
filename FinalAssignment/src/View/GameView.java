@@ -62,7 +62,7 @@ public class GameView
 				LobbyView lobbyView = new LobbyView(client, gameFrame);
 				client.setLobbyView(lobbyView);
 				gameFrame.dispose();
-				//client.clientDisconnect();
+				client.clientDisconnect();
 			}
 		});
 
@@ -81,44 +81,4 @@ public class GameView
 		}
 		return false;
 	}
-
-	//TEST to be removed
-	/*
-	public static void main(String[] args) 
-	{
-		int x = 5;
-		int y = 5;
-		String[][] board = new String[x][y];
-		for(int i = 0; i < x; i++)
-		{
-			for(int j = 0; j < y ; j++)
-			{
-				board[i][j] = "Hi";
-			}
-		}
-		ClickListener listener = new ClickListener(){
-			public void onClick(int x, int y){
-				System.out.println("(" + x + "," + y +")");
-			}
-		};
-		Map<String, String> state = new HashMap<String, String>();
-		List<Message> messages = new ArrayList<Message>();
-		GameView hws = new GameView(board, state, messages, listener);
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			br.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		for(int i = 0; i < x; i++)
-		{
-			for(int j = 0; j < y ; j++)
-			{
-				board[i][j] = i + ", " + j;
-			}
-		}
-		hws.update(board,state, messages);
-	}
-	 */
 }

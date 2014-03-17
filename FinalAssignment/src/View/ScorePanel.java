@@ -28,8 +28,5 @@ public class ScorePanel extends JPanel {
 		//TODO: Write the update!
 		return false;
 	}
-	
-	
-	
 }
 

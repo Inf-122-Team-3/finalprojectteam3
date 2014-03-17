@@ -20,11 +20,13 @@ public class ModelSimplifier {
 		}
 		
 		sm.messages = new ArrayList<Message>();
-//		if(p != null) {
-//			for(Message mess : m.getMessages(p))
-//				sm.messages.add(mess);
-//		}
-//		
+		if(p != null) {
+			if(m.getMessages(p) != null) {
+				for(Message mess : m.getMessages(p))
+					sm.messages.add(mess);
+			}
+		}
+		
 		return sm;
 	}
 }
