@@ -333,12 +333,19 @@ public class Server
 						//						}
 
 						//Sends the game factory with a list of players
+						//Sends to both clients and starts game if accepted
 						Vector<String> toSendData = new Vector<String>();
 						if(gameFactory != null) {
 							toSendData.add(this.server.Json.toJson(gameFactory));
 							toSendData.add(this.server.Json.toJson(listOfPlayers));
 							Command command = new Command("#STARTGAME", this.server.Json.toJson(toSendData));
 							msg_to_client.addCommand(command);
+							
+							//new PrintWriter(sendTo.getOutputStream(), true).println(invitiation.toJson());
+							
+							getPlayerSocket(player1.getUsername());
+							getPlayerSocket(player2.getUsername());
+							
 						}
 					}
 					else {
@@ -357,8 +364,11 @@ public class Server
 					return p;
 				}
 			}
-
 			return null;
+		}
+		
+		private Socket getPlayerSocket(String username) {
+			return this.server.connectedClients.get(username);
 		}
 
 		@Override

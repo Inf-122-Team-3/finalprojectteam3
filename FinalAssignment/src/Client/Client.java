@@ -85,7 +85,7 @@ public class Client {
 	}
 
 	private void sendCommand(Vector<Command> commands){
-		System.out.println("sendCommand");
+		//System.out.println("sendCommand");
 		NetworkMessage m = new NetworkMessage((this.player != null ? this.player.getId() : -1));
 		m.setCommands(commands);
 		out.println(m.toJson());
@@ -165,7 +165,7 @@ public class Client {
 				if(!c.getFail()){
 					this.player = Json.fromJson((String) c.getContent(), Player.class);
 					System.out.println("SIGNIN SUCESSUFUL ID ="+this.player.getId());
-					sendInvite("Test", "theonepoofei");
+					//sendInvite("Game1", "test2");
 				}
 				else{
 					System.out.println("Fail: "+c.getContent());
