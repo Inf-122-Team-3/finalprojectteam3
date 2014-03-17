@@ -5,22 +5,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import Game.GameFactory;
 import GameViewAdaptor.Adaptor;
 import Model.Model;
+import Model.ModelSimplifier;
 import Util.Command;
 import Util.Invite;
 import Util.NetworkMessage;
 import Util.Player;
+import Util.SimplifiedModel;
+import View.GameView;
 import View.LobbyView;
 import View.Login;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class Client {
 	class Receptor extends Thread{
@@ -52,9 +58,12 @@ public class Client {
 	Gson Json;
 	LobbyView lobbyView;
 	Login loginView;
+	GameView gameView;
 	
 	String[] listOfGames;
 	String[] listOfAvaliablePlayers;
+	
+	int currentGameKey = -1;
 	
 	public Client(String username, Login loginView) {
 		this.loginView = loginView;
@@ -84,6 +93,10 @@ public class Client {
 	public void setLobbyView(LobbyView lobbyView)
 	{
 		this.lobbyView = lobbyView;
+	}
+	
+	public void setGameView(GameView gameView) {
+		this.gameView = gameView;
 	}
 	
 	public void clientDisconnect() {
@@ -187,13 +200,17 @@ public class Client {
 		sendCommand(v);
 	}
 
-	private void updateView(){
-		//view.updateView(model);
+	private void updateView(SimplifiedModel model){
+		gameView.update(model.grid, null, model.messages);
 	}
 
-	private void startGame(GameFactory gameFactory, List<Player> listOfPlayers){
-		//view.startGame(model);
-		new Adaptor(gameFactory, listOfPlayers, this);
+	private void startGame(SimplifiedModel model, List<Player> listOfPlayers){
+		Vector<Command> v = new Vector<>();
+		//#INVITERESPONSE
+		v.add(new Command("#GAMESTARTED", new Gson().toJson(currentGameKey)));
+		sendCommand(v);
+		
+		new Adaptor(model, listOfPlayers, this);
 	}
 
 	public void processMessage(String jsonString){
@@ -222,16 +239,16 @@ public class Client {
 			//Server repsonse for starting a game
 			else if(c.getType().equals("#STARTGAME")){
 				Vector<String> content = Json.fromJson(c.getContent(), Vector.class);
-				//GameFactory gameFactory = Json.fromJson(content.get(0), GameFactory.class);
-				Model model = Json.fromJson(content.get(0), Model.class);
-				List<Player> listOfPlayers = Json.fromJson(content.get(1), List.class);
+				SimplifiedModel model = Json.fromJson(content.get(0), SimplifiedModel.class);
+				Type listType = new TypeToken<ArrayList<Player>>() {}.getType();
+				List<Player> listOfPlayers = new Gson().fromJson(content.get(1), listType);
+				int gameKey = new Gson().fromJson(content.get(2), int.class);
 				
-				new Adaptor(model, listOfPlayers, this);
-				//startGame(gameFactory, listOfPlayers);
-			}
-			//Server repsonse for move being made in game
-			else if(c.getType().equals("#CLICK")){
-				updateView();
+				lobbyView.hideWindow();
+				
+				currentGameKey = gameKey;
+				//new Adaptor(model, listOfPlayers, this);
+				startGame(model, listOfPlayers);
 			}
 			//Server response for getting active players
 			else if(c.getType().equals("#GETAVAILABLEPLAYERS")){
@@ -241,9 +258,10 @@ public class Client {
 			else if(c.getType().equals("#GETLISTOFGAMES")){
 				updateListOfGames((Vector<String>)(Json.fromJson(c.getContent(), Vector.class)));
 			}
-			//Updating game view
+			//Server repsonse for move being made in game, Updating game view
 			else if(c.getType().equals("#MODELUPDATED")){
-				updateView();
+				SimplifiedModel model = (SimplifiedModel) new Gson().fromJson(c.getContent(), SimplifiedModel.class);
+				updateView(model);
 			}
 			//Server sent an invitation, someone invited user to game
 			else if(c.getType().equals("#INVITATION")) {

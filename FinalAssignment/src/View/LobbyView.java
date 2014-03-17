@@ -142,6 +142,10 @@ public class LobbyView {
 		}
 	}
 	
+	public void hideWindow() {
+		lobbyFrame.setVisible(false);
+	}
+	
 	public boolean update()
 	{
 		return false;

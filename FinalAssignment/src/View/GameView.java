@@ -32,6 +32,7 @@ public class GameView
 		gamePanel = new GameGridPanel(board, listener);
 		scorePanel = new ScorePanel(state);
 		this.client = client;
+		this.client.setGameView(this);
 		setup(board, state, messages);
 	}
 	
@@ -58,10 +59,10 @@ public class GameView
 			public void windowClosing(WindowEvent e)
 			{
 				System.out.println("Window closing");
-				LobbyView lobbyView = new LobbyView(null, gameFrame);
-				//LobbyView lobbyView = new LobbyView(client, gameFrame);
-				//client.setLobbyView(lobbyView);
-				//gameFrame.dispose();
+				LobbyView lobbyView = new LobbyView(client, gameFrame);
+				client.setLobbyView(lobbyView);
+				gameFrame.dispose();
+				//client.clientDisconnect();
 			}
 		});
 

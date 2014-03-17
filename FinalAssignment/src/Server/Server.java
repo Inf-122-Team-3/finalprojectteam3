@@ -22,11 +22,13 @@ import Game.Connect4.Connect4Factory;
 import Game.Gomoku.GomokuFactory;
 import Game.TicTacToe.TicTacToeFactory;
 import Model.Model;
+import Model.ModelSimplifier;
 import Util.Command;
 import Util.IDGenerator;
 import Util.Invite;
 import Util.NetworkMessage;
 import Util.Player;
+import Util.SimplifiedModel;
 
 import com.google.gson.Gson;
 
@@ -295,24 +297,23 @@ public class Server
 							gameFactory = new GomokuFactory();
 							//ongoingGame = gameFactory.createGame(listOfPlayers);
 						}
-
-						//Sends the model
-						//if(ongoingGame != null) {
-						//	Command command = new Command("#STARTGAME", this.server.Json.toJson(ongoingGame.getModel()));
-						//	msg_to_client.addCommand(command);
-						//}
-
-						//Sends the game factory with a list of players
+						
+						//Sends the model factory with a list of players
 						//Sends to both clients and starts game if accepted
 						Vector<String> toSendData = new Vector<String>();
 						if(gameFactory != null) {
 							//Build the model to pass back to game view
 							GameInstance gameInstance = gameFactory.createGame(listOfPlayers);
-							Model model = gameInstance.getModel();
+							Model gameModel = gameInstance.getModel();
+							int gameKey = Util.IDGenerator.getNextID();
+							
+							server.currentGames.put(gameKey, gameInstance);
+							
+							SimplifiedModel model = ModelSimplifier.simplify(gameModel, null);
 							
 							toSendData.add(Server.Json.toJson(model));
-							toSendData.add(Server.Json.toJson(listOfPlayers));
-							//toSendData.add(Server.Json.toJson(gameStart));
+							toSendData.add(Server.Json.toJson(gameInstance.getPlayers()));
+							toSendData.add(Server.Json.toJson(gameKey));
 							
 							//Send the data to both players
 							Command command = new Command("#STARTGAME", this.server.Json.toJson(toSendData));
@@ -343,6 +344,14 @@ public class Server
 						}
 					}
 				}
+				
+				//Sets the game that is currently running on the thread
+				else if(c.getType().equals("#GAMESTARTED")){ 
+					int gameKey = new Gson().fromJson(c.getContent(), int.class);
+					ongoingGame = server.currentGames.get(gameKey);
+					
+					System.out.println("Game has started between " + ongoingGame.getPlayers().get(0).getUsername() + " and " + ongoingGame.getPlayers().get(1).getUsername());
+				}
 
 				else if(c.getType().equals("#CLICK")){
 					//to implement, call game logic moves
@@ -354,9 +363,30 @@ public class Server
 					int y = (int) coordinate.getY();
 					Player p = getPlayer(username);
 
-					ongoingGame.update(x, y, p);
+					Model updatedModel = ongoingGame.update(x, y, p);
+					SimplifiedModel model = ModelSimplifier.simplify(updatedModel, p);
+					
+					//Send the data to both players
+					Command command = new Command("#MODELUPDATED", new Gson().toJson(model));
 
-					//SEND both players updated model
+					NetworkMessage modelmessage = new NetworkMessage();
+					modelmessage.addCommand(command);
+
+					//Gets the two players
+					Player player1 = ongoingGame.getPlayers().get(0);
+					Player player2 = ongoingGame.getPlayers().get(1);
+					
+					//Gets their socket to send two
+					Socket player1Socket = getPlayerSocket(player1.getUsername());
+					Socket player2Socket = getPlayerSocket(player2.getUsername());
+
+					try {
+						new PrintWriter(player1Socket.getOutputStream(), true).println(modelmessage.toJson());
+						new PrintWriter(player2Socket.getOutputStream(), true).println(modelmessage.toJson());
+					} catch (IOException e) {
+						System.err.println("Could not send to this socket");
+					}
+					
 				}
 
 				else if(c.getType().equals("#GETAVAILABLEPLAYERS")){
@@ -377,9 +407,8 @@ public class Server
 
 				else if(c.getType().equals("#DISCONNECT")){
 					String username = c.getContent();
-					//System.out.println(username + " disconnected");
 					for(Player p: this.server.activePlayers.values()){
-						//user already signed in
+						//find the signed in user in active players, and remove
 						if(p.getUsername().equals(username)){
 							this.server.activePlayers.remove(username);
 						}
@@ -390,7 +419,7 @@ public class Server
 		}
 
 		private Player getPlayer(String username) {
-			for(Player p : this.server.allPlayers) {
+			for(Player p : Server.allPlayers) {
 				if(p.getUsername().compareTo(username) == 0) {
 					return p;
 				}
@@ -401,7 +430,7 @@ public class Server
 		private Socket getPlayerSocket(String username) {
 			return this.server.connectedClients.get(username);
 		}
-
+		
 		@Override
 		public void run() {
 			String input;
