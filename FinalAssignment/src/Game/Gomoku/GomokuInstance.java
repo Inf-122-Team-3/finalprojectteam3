@@ -29,7 +29,7 @@ public class GomokuInstance extends XInARowGame{
 		{
 			GameObject o = m.getBoard().getObjectAtLocation(x, y);
 			if(o==null){
-				m.getBoard().setObjectAtLocation(x, y, new GomokuObject(turn==0 ? "B" : "W"));
+				m.getBoard().setObjectAtLocation(x, y, new GomokuObject(turn == 0 ? "B" : "W"));
 				if(checkFiveInARow(x, y)){
 					alertWin(p);
 					for(int i = 0; i < getPlayers().size(); i++)
