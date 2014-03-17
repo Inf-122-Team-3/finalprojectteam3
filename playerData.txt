@@ -1,11 +1,2 @@
-{"username":"THEONEPOOFEI","id":1325415149,"wins":0,"losses":0}
-{"username":"TEST2","id":1083025164,"wins":0,"losses":0}
-{"username":"DTHEONEPOOFEI","id":1603752445,"wins":0,"losses":0}
-{"username":"THEONEPOOFEI2","id":370952048,"wins":0,"losses":0}
-{"username":"POOFY","id":429279966,"wins":0,"losses":0}
-{"username":"DSFDSG","id":1749900606,"wins":0,"losses":0}
-{"username":"DFSAFSDF","id":886384117,"wins":0,"losses":0}
-{"username":"DSFASDFS","id":206356030,"wins":0,"losses":0}
-{"username":"SADFDSAF","id":1741302798,"wins":0,"losses":0}
-{"username":"TEST1","id":1285859057,"wins":0,"losses":0}
-{"username":"BOBBY","id":1003437885,"wins":0,"losses":0}
+{"username":"TEST1","id":258338401,"wins":0,"losses":0}
+{"username":"TEST2","id":407067944,"wins":0,"losses":0}

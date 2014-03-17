@@ -2,12 +2,10 @@ package Server;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -16,16 +14,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Vector;
-
-import org.omg.SendingContext.RunTime;
 
 import Game.GameFactory;
 import Game.GameInstance;
 import Game.Connect4.Connect4Factory;
 import Game.Gomoku.GomokuFactory;
 import Game.TicTacToe.TicTacToeFactory;
+import Model.Model;
 import Util.Command;
 import Util.IDGenerator;
 import Util.Invite;
@@ -33,7 +29,6 @@ import Util.NetworkMessage;
 import Util.Player;
 
 import com.google.gson.Gson;
-import com.sun.xml.internal.bind.v2.runtime.Coordinator;
 
 public class Server
 {
@@ -60,12 +55,12 @@ public class Server
 	public Server() {
 		this.activePlayers = new HashMap<String, Player>();
 		this.availablePlayers = new HashMap<String, Player>();
-		this.allPlayers = new Vector<Player>();
+		Server.allPlayers = new Vector<Player>();
 		this.gameMap = new HashMap<String, GameFactory>();
 		this.currentGames = new HashMap<Integer, GameInstance>();
 		this.threads = new HashMap<Integer, ServerThread>();
 		this.connectedClients = new HashMap<String, Socket>();
-		this.Json = new Gson();
+		Server.Json = new Gson();
 
 		buildGameMap();
 	}
@@ -115,14 +110,14 @@ public class Server
 			File file = new File("playerData.txt");
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
-			
+
 			String currentLine;
 			while((currentLine = br.readLine()) != null) {
-				System.out.println(currentLine);
+				//System.out.println(currentLine);
 				Player p = Server.Json.fromJson(currentLine, Player.class);
 				allPlayers.add(p);
 			}
-			
+
 			new Listen(server, serverConnect).start();
 		}
 		catch (IOException e) {
@@ -137,19 +132,19 @@ public class Server
 			if(file.exists()) {
 				file.delete();
 			}
-			
+
 			file.createNewFile();
 
 			fw = new FileWriter(file, false);
 			bw = new BufferedWriter(fw);
-		
+
 			for(Player p : allPlayers) {
 				bw.write(Server.Json.toJson(p));
 				bw.newLine();
 			}
 			bw.close();
 		} catch (Exception e) {
-			
+
 		}
 		System.exit(0);
 	}
@@ -200,16 +195,15 @@ public class Server
 		}
 
 		public void processRequest(String jsonString) throws IOException{
-			System.out.println("Message received from client: "+jsonString);
+			//System.out.println("Message received from client: "+jsonString);
 			NetworkMessage msg_from_client = this.server.Json.fromJson(jsonString, NetworkMessage.class);
 			NetworkMessage msg_to_client = new NetworkMessage();
 
 			for(Command c: msg_from_client.getCommands()){
 				if(c.getType().equals("#SIGNIN")){
-					System.out.println("User "+c.getContent()+" signing in");
-
 					boolean fail = false;
 					boolean playerExists = false;
+					//Looks if the player is already logged in, if it is, ends search and sets fail tag to notify user of error
 					for(Player p: this.server.activePlayers.values()){
 						//user already signed in
 						if(p.getUsername().equals(c.getContent())){
@@ -219,7 +213,8 @@ public class Server
 						}
 					}
 
-					//Loads player
+					//If user is not signed it, look if profile exists
+					//Loads that player profile
 					if(!fail) {
 						for(Player p : Server.allPlayers) {
 							if(p.getUsername().compareTo(c.getContent()) == 0) {
@@ -235,9 +230,9 @@ public class Server
 						}
 					}
 
+					//If player is not signed in, and does not exist, creates new player profile
 					if(!fail && !playerExists){
 						Player p = new Player(IDGenerator.getNextID(), (String) c.getContent());
-
 						msg_to_client.addCommand(new Command("#SIGNIN", this.server.Json.toJson(p,Player.class)));
 
 						Server.allPlayers.add(p);
@@ -248,11 +243,12 @@ public class Server
 					}
 				}
 
+				//Invitation was sent by a user
 				else if(c.getType().equals("#INVITE")){
 					Vector<String> contentData = (Vector<String>) this.server.Json.fromJson( c.getContent(), Vector.class);
 					for(String key : this.server.connectedClients.keySet())
 					{
-						System.out.println(key);
+						//System.out.println(key);
 						if(contentData.get(1).compareToIgnoreCase(key) == 0)
 						{
 							//Send invite via socket
@@ -270,7 +266,82 @@ public class Server
 							}
 						}
 					}
+				}
 
+				else if(c.getType().equals("#INVITERESPONSE")){
+					//to implement, reply
+					Invite invite = Server.Json.fromJson(c.getContent(), Invite.class);
+					
+					if(invite.getAccepted()) {
+						List<Player> listOfPlayers = new ArrayList<Player>();
+						Player player1 = getPlayer(invite.getSenderUsername());
+						Player player2 = getPlayer(invite.getRecipientUsername());
+
+						listOfPlayers.add(player1);
+						listOfPlayers.add(player2);
+
+						//Start game
+						GameFactory gameFactory = this.server.gameMap.get(invite.getGame());
+
+						if(gameFactory.getClass().equals(TicTacToeFactory.class)) {
+							gameFactory = new TicTacToeFactory();
+							//ongoingGame = gameFactory.createGame(listOfPlayers);
+						}
+						else if(gameFactory.getClass().equals(Connect4Factory.class)) {
+							gameFactory = new Connect4Factory();
+							//ongoingGame = gameFactory.createGame(listOfPlayers);
+						}
+						else if(gameFactory.getClass().equals(GomokuFactory.class)) {
+							gameFactory = new GomokuFactory();
+							//ongoingGame = gameFactory.createGame(listOfPlayers);
+						}
+
+						//Sends the model
+						//if(ongoingGame != null) {
+						//	Command command = new Command("#STARTGAME", this.server.Json.toJson(ongoingGame.getModel()));
+						//	msg_to_client.addCommand(command);
+						//}
+
+						//Sends the game factory with a list of players
+						//Sends to both clients and starts game if accepted
+						Vector<String> toSendData = new Vector<String>();
+						if(gameFactory != null) {
+							//Build the model to pass back to game view
+							GameInstance gameInstance = gameFactory.createGame(listOfPlayers);
+							Model model = gameInstance.getModel();
+							
+							toSendData.add(Server.Json.toJson(model));
+							toSendData.add(Server.Json.toJson(listOfPlayers));
+							//toSendData.add(Server.Json.toJson(gameStart));
+							
+							//Send the data to both players
+							Command command = new Command("#STARTGAME", this.server.Json.toJson(toSendData));
+
+							NetworkMessage newGameMessage = new NetworkMessage();
+							newGameMessage.addCommand(command);
+
+							Socket player1Socket = getPlayerSocket(player1.getUsername());
+							Socket player2Socket = getPlayerSocket(player2.getUsername());
+
+							try {
+								new PrintWriter(player1Socket.getOutputStream(), true).println(newGameMessage.toJson());
+								new PrintWriter(player2Socket.getOutputStream(), true).println(newGameMessage.toJson());
+							} catch (IOException e) {
+								System.err.println("Could not send to this socket");
+							}
+						}
+					}
+					else {
+						//Sends declined notice to user who started invite
+						Socket sendTo = getPlayerSocket(invite.getSenderUsername());
+						NetworkMessage inviteDeclined = new NetworkMessage();
+						inviteDeclined.addCommand(new Command("#INVITEDECLINED", this.server.Json.toJson(invite)));
+						try {
+							new PrintWriter(sendTo.getOutputStream(), true).println(inviteDeclined.toJson());
+						} catch (IOException e) {
+							System.err.println("Could not send to this socket");
+						}
+					}
 				}
 
 				else if(c.getType().equals("#CLICK")){
@@ -289,12 +360,10 @@ public class Server
 				}
 
 				else if(c.getType().equals("#GETAVAILABLEPLAYERS")){
-					System.out.println("#GETAVAILABLEPLAYERS");
+					//System.out.println("#GETAVAILABLEPLAYERS");
 					Vector<String> v = new Vector<>();
-
-					for(Player p: this.server.availablePlayers.values())
+					for(Player p: this.server.activePlayers.values())
 						v.add(p.getUsername());
-
 					msg_to_client.addCommand(new Command("#GETAVAILABLEPLAYERS", this.server.Json.toJson(v)));
 				}
 
@@ -303,55 +372,17 @@ public class Server
 					for(String gameName : this.server.gameMap.keySet()) {
 						v.add(gameName);
 					}
-
 					msg_to_client.addCommand(new Command("#GETLISTOFGAMES", this.server.Json.toJson(v)));
 				}
 
-				else if(c.getType().equals("#INVITERESPONSE")){
-					//to implement, reply
-					Vector<String> contentData = (Vector<String>) this.server.Json.fromJson( c.getContent(), Vector.class);
-					Invite invite = this.server.Json.fromJson(contentData.get(0), Invite.class);
-					if(invite.getAccepted()) {
-						List<Player> listOfPlayers = new ArrayList<Player>();
-						Player player1 = getPlayer(invite.getSenderUsername());
-						Player player2 = getPlayer(invite.getRecipientUsername());
-
-						listOfPlayers.add(player1);
-						listOfPlayers.add(player2);
-
-						//Start game
-						GameFactory gameFactory = this.server.gameMap.get(invite.getGame());
-						if(gameFactory.getClass().equals(TicTacToeFactory.class)) {
-							gameFactory = new TicTacToeFactory();
-							ongoingGame = gameFactory.createGame(listOfPlayers);
+				else if(c.getType().equals("#DISCONNECT")){
+					String username = c.getContent();
+					//System.out.println(username + " disconnected");
+					for(Player p: this.server.activePlayers.values()){
+						//user already signed in
+						if(p.getUsername().equals(username)){
+							this.server.activePlayers.remove(username);
 						}
-						else if(gameFactory.getClass().equals(Connect4Factory.class)) {
-							gameFactory = new Connect4Factory();
-							ongoingGame = gameFactory.createGame(listOfPlayers);
-						}
-
-						//Sends the model
-						//						if(ongoingGame != null) {
-						//							Command command = new Command("#STARTGAME", this.server.Json.toJson(ongoingGame.getModel()));
-						//							msg_to_client.addCommand(command);
-						//						}
-
-						//Sends the game factory with a list of players
-						//Sends to both clients and starts game if accepted
-						Vector<String> toSendData = new Vector<String>();
-						if(gameFactory != null) {
-							toSendData.add(this.server.Json.toJson(gameFactory));
-							toSendData.add(this.server.Json.toJson(listOfPlayers));
-							Command command = new Command("#STARTGAME", this.server.Json.toJson(toSendData));
-							msg_to_client.addCommand(command);
-							
-							getPlayerSocket(player1.getUsername());
-							getPlayerSocket(player2.getUsername());
-							
-						}
-					}
-					else {
-						
 					}
 				}
 			}
@@ -366,7 +397,7 @@ public class Server
 			}
 			return null;
 		}
-		
+
 		private Socket getPlayerSocket(String username) {
 			return this.server.connectedClients.get(username);
 		}

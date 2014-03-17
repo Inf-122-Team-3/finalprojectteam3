@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Vector;
 
 import Game.GameFactory;
+import GameViewAdaptor.Adaptor;
+import Model.Model;
 import Util.Command;
 import Util.Invite;
 import Util.NetworkMessage;
@@ -84,6 +86,12 @@ public class Client {
 		this.lobbyView = lobbyView;
 	}
 	
+	public void clientDisconnect() {
+		Vector<Command> commands = new Vector<>();
+		commands.add(new Command("#DISCONNECT", player.getUsername()));
+		sendCommand(commands);
+	}
+
 	private void sendCommand(Vector<Command> commands){
 		//System.out.println("sendCommand");
 		NetworkMessage m = new NetworkMessage((this.player != null ? this.player.getId() : -1));
@@ -146,10 +154,25 @@ public class Client {
 		v.add(new Command("#INVITE", Json.toJson(v2)));
 		sendCommand(v);
 	}
+	
+	private void receiveInvitation(Invite invite){
+		//System.out.println("Recieved invite from " + username + " for " + game);
+		if(lobbyView != null) {
+			//Call lobbyview method here to show message 
+			lobbyView.gameInvite(invite);
+		}
+	}
+	
+	private void inviteRepsonse(Invite invite) {
+		if(lobbyView != null) {
+			lobbyView.inviteDeclined(invite);
+		}
+	}
 
-	public void respondInvitation(int codeInvitation, Boolean accept){
+	public void respondInvitation(Invite invite) {
 		Vector<Command> v = new Vector<>();
-		v.add(new Command("#ACCEPTINVITE", Json.toJson(codeInvitation)));
+		//#INVITERESPONSE
+		v.add(new Command("#INVITERESPONSE", Json.toJson(invite)));
 		sendCommand(v);
 	}
 
@@ -170,14 +193,7 @@ public class Client {
 
 	private void startGame(GameFactory gameFactory, List<Player> listOfPlayers){
 		//view.startGame(model);
-	}
-
-	private void receiveInvitation(String username, String game){
-		System.out.println("Recieved invite from " + username + " for " + game);
-		//view.invitation();
-		if(lobbyView != null) {
-			//Call lobbyview method here to show message 
-		}
+		new Adaptor(gameFactory, listOfPlayers, this);
 	}
 
 	public void processMessage(String jsonString){
@@ -206,10 +222,12 @@ public class Client {
 			//Server repsonse for starting a game
 			else if(c.getType().equals("#STARTGAME")){
 				Vector<String> content = Json.fromJson(c.getContent(), Vector.class);
-				GameFactory gameFactory = Json.fromJson(content.get(0), GameFactory.class);
+				//GameFactory gameFactory = Json.fromJson(content.get(0), GameFactory.class);
+				Model model = Json.fromJson(content.get(0), Model.class);
 				List<Player> listOfPlayers = Json.fromJson(content.get(1), List.class);
 				
-				startGame(gameFactory, listOfPlayers);
+				new Adaptor(model, listOfPlayers, this);
+				//startGame(gameFactory, listOfPlayers);
 			}
 			//Server repsonse for move being made in game
 			else if(c.getType().equals("#CLICK")){
@@ -230,14 +248,13 @@ public class Client {
 			//Server sent an invitation, someone invited user to game
 			else if(c.getType().equals("#INVITATION")) {
 				Invite invite = Json.fromJson(c.getContent(), Invite.class);
-				receiveInvitation(invite.getSenderUsername(), invite.getGame());
+				receiveInvitation(invite);
 			}
 			//Server repsonse, invite repsonse from other player
-			else if(c.getType().equals("#INVITERESPONSE")) {
+			else if(c.getType().equals("#INVITEDECLINED")) {
 				Invite invite = Json.fromJson(c.getContent(), Invite.class);
-				receiveInvitation(invite.getSenderUsername(), invite.getGame());
+				inviteRepsonse(invite);
 			}
-			
 		}	
 	}
 }
