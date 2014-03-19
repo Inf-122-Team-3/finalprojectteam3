@@ -45,7 +45,8 @@ public class GameView
 	
 	public boolean update(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
 	{
-		if(gamePanel.update(board) && scorePanel.update(state))
+		MessageHandler.DisplayMessages(messages);
+		if(gamePanel.update(board) && scorePanel.update(state) )
 		{
 			gameFrame.revalidate();
 			gameFrame.repaint();
@@ -74,7 +75,9 @@ public class GameView
 		};
 		Map<String, String> state = new HashMap<String, String>();
 		List<Message> messages = new ArrayList<Message>();
+		messages.add(new Message("works"));
 		GameView hws = new GameView(board, state, messages, listener);
+		MessageHandler.DisplayMessages(messages);
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			br.readLine();
