@@ -1,12 +1,14 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import Util.Player;
 import Util.SimplifiedModel;
 
 public class ModelSimplifier {
-	
+
 	public static SimplifiedModel simplify(Model m, Player p){
 		SimplifiedModel sm = new SimplifiedModel();
 		sm.grid = new String[m.getBoard().getWidth()][m.getBoard().getHeight()];
@@ -18,7 +20,7 @@ public class ModelSimplifier {
 					sm.grid[i][j] = m.getBoard().getObjectAtLocation(i, j).getRepresentation();
 			}
 		}
-		
+
 		sm.messages = new ArrayList<Message>();
 		if(p != null) {
 			if(m.getMessages(p) != null) {
@@ -26,7 +28,16 @@ public class ModelSimplifier {
 					sm.messages.add(mess);
 			}
 		}
+
+		sm.listOfMessages = new HashMap<String, List<String>>();
 		
+		for(Player player : m.getAllMessages().keySet()) {
+			List<String> messages = new ArrayList<String>();
+			for(Message message : m.getMessages(player)) {
+				messages.add(message.getContent());
+			}
+			sm.listOfMessages.put(player.getUsername(), messages);
+		}
 		return sm;
 	}
 }

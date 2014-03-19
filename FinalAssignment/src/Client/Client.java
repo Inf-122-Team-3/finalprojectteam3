@@ -201,7 +201,7 @@ public class Client {
 	}
 
 	private void updateView(SimplifiedModel model){
-		gameView.update(model.grid, null, model.messages);
+		gameView.update(model.grid, null, model.messages, model.listOfMessages.get(player.getUsername()));
 	}
 
 	private void startGame(SimplifiedModel model, List<Player> listOfPlayers){

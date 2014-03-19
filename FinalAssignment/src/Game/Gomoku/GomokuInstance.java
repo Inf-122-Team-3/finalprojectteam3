@@ -25,6 +25,7 @@ public class GomokuInstance extends XInARowGame{
 	@Override
 	public void onPlayerClick(int x, int y, Player p) {
 		Model m = getModel();
+		m.clearMessages();
 		if(isPlayersTurn(p))
 		{
 			GameObject o = m.getBoard().getObjectAtLocation(x, y);

@@ -1,21 +1,13 @@
 package Server;
 
 import java.awt.EventQueue;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class ServerStart {
 
@@ -57,7 +49,7 @@ public class ServerStart {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Server.startServer();
-				JOptionPane.showMessageDialog(null, "Server started");
+				JOptionPane.showMessageDialog(frame, "Server started");
 				btnNewButton.setEnabled(false);
 			}
 		});

@@ -34,6 +34,7 @@ public class Connect4Instance extends XInARowGame{
 	@Override
 	public void onPlayerClick(int x, int y, Player p) {
 		Model m = getModel();
+		m.clearMessages();
 		if (isPlayersTurn(p))
 		{
 			if(m.getBoard().getObjectAtLocation(x, 0)==null)
