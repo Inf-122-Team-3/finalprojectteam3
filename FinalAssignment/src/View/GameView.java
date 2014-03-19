@@ -74,11 +74,7 @@ public class GameView
 
 	public boolean update(String[][] board, Map<String, String> state, List<Message> messages, List<String> listOfMessages) //Will be replaced w/ SimplifiedModel
 	{
-		if(listOfMessages != null && listOfMessages.size() > 0) {
-			for(String message : listOfMessages) {
-				JOptionPane.showMessageDialog(gameFrame, message);
-			}
-		}
+		MessageHandler.DisplayMessages(messages);
 		
 		if(gamePanel.update(board) && scorePanel.update(state))
 		{
