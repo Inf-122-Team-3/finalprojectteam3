@@ -35,6 +35,8 @@ public class ScorePanel extends JPanel {
 	
 	private String generateScoreboard(Map<String, String> state)
 	{
+		if(state==null)
+			return "";
 		String ans = "";
 		for(String s : state.keySet())
 			ans = ans + s + ": " + state.get(s) + "\n";

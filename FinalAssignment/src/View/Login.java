@@ -10,6 +10,8 @@ public class Login extends JFrame
 {
 	private JLabel usernameLabel;
 	private JTextField usernameTextField;
+	private JLabel serverIPLabel;
+	private JTextField serverIP;
 	private JButton submitButton;
 	private JPanel contentPane;
 	private Client client;
@@ -29,6 +31,8 @@ public class Login extends JFrame
 		contentPane = (JPanel)this.getContentPane();
 		usernameLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		usernameLabel.setText("Username:");
+		serverIPLabel = new JLabel("Server IP Address: ");
+		serverIP = new JTextField();
 		
 		
 		submitButton.setText("Submit");
@@ -41,14 +45,17 @@ public class Login extends JFrame
 
 		//setting the layout
 		contentPane.setLayout(null);
-		addComponent(contentPane, usernameLabel, 5,10,106,18);
-		addComponent(contentPane, usernameTextField, 110,10,183,22);
-		addComponent(contentPane, submitButton, 150,75,83,28);
+		addComponent(contentPane, usernameLabel, 5,10,125,18);
+		addComponent(contentPane, usernameTextField, 150,10,143,22);
+		addComponent(contentPane, serverIPLabel, 5, 50, 125, 18);
+		addComponent(contentPane, serverIP, 150, 50, 143, 22);
+		addComponent(contentPane, submitButton, 150, 90, 83,28);
+		
 		
 		//title	
 		this.setTitle("Login");
 		this.setLocation(new Point(76, 182));
-		this.setSize(new Dimension(335, 141));
+		this.setSize(new Dimension(335, 175));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setResizable(false);
 	}
@@ -64,7 +71,7 @@ public class Login extends JFrame
 	{
 		//System.out.println("\nsubmitButton_actionPerformed(ActionEvent e) called.");
 		String username = new String(usernameTextField.getText());
-		client = new Client(username, this);
+		client = new Client(username, this, serverIP.getName());
 	}
 	
 	public void loadLobbyView() {

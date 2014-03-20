@@ -1,2 +1,10 @@
-{"username":"TEST1","id":1596979407,"wins":1,"losses":1}
-{"username":"TEST2","id":1080593988,"wins":1,"losses":1}
+{"username":"DSFSADF","id":779324392,"wins":0,"losses":0}
+{"username":"DASFDSAF","id":990696332,"wins":0,"losses":0}
+{"username":"TEWST1","id":1169707109,"wins":0,"losses":0}
+{"username":"TESAFDSA","id":6202468,"wins":0,"losses":0}
+{"username":"TES1","id":649207306,"wins":1,"losses":0}
+{"username":"TES3","id":1962844786,"wins":0,"losses":0}
+{"username":"TEST1","id":1546213956,"wins":0,"losses":3}
+{"username":"TEST2","id":1629445818,"wins":3,"losses":1}
+{"username":"TEST3","id":1037452574,"wins":1,"losses":0}
+{"username":"","id":1001941474,"wins":0,"losses":0}
