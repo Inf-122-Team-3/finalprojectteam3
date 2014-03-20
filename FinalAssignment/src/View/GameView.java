@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -71,8 +72,10 @@ public class GameView
 
 	}
 
-	public boolean update(String[][] board, Map<String, String> state, List<Message> messages) //Will be replaced w/ SimplifiedModel
+	public boolean update(String[][] board, Map<String, String> state, List<Message> messages, List<String> listOfMessages) //Will be replaced w/ SimplifiedModel
 	{
+		MessageHandler.DisplayMessages(messages);
+		
 		if(gamePanel.update(board) && scorePanel.update(state))
 		{
 			gameFrame.revalidate();

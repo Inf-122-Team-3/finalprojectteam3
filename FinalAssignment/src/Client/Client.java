@@ -48,7 +48,7 @@ public class Client {
 			}
 		}
 	}
-	static String HOSTNAME = "127.0.0.1";	//change host name to ip of the server, use whatismyip.com	
+	//static String HOSTNAME = "127.0.0.1";	//change host name to ip of the server, use whatismyip.com	
 	static int PORT = 8080;	
 
 	Socket kkSocket;
@@ -65,13 +65,13 @@ public class Client {
 	
 	int currentGameKey = -1;
 	
-	public Client(String username, Login loginView) {
+	public Client(String username, Login loginView, String hostname) {
 		this.loginView = loginView;
 		username = username.toUpperCase();
 		Json = new Gson();
 		
 		try  {
-			kkSocket = new Socket(HOSTNAME, PORT);
+			kkSocket = new Socket(hostname, PORT);
 			out = new PrintWriter(kkSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));
 
@@ -82,10 +82,10 @@ public class Client {
 			new Receptor(in).start();
 
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host " + HOSTNAME);
+			System.err.println("Don't know about host " + hostname);
 			System.exit(1);
 		} catch (IOException e) {
-			System.err.println("Couldn't get I/O for the connection to " + HOSTNAME);
+			System.err.println("Couldn't get I/O for the connection to " + hostname);
 			System.exit(1);
 		}
 	}
@@ -201,7 +201,7 @@ public class Client {
 	}
 
 	private void updateView(SimplifiedModel model){
-		gameView.update(model.grid, null, model.messages);
+		gameView.update(model.grid, null, model.messages, model.listOfMessages.get(player.getUsername()));
 	}
 
 	private void startGame(SimplifiedModel model, List<Player> listOfPlayers){

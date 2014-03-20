@@ -18,6 +18,7 @@ import java.util.Vector;
 
 import Game.GameFactory;
 import Game.GameInstance;
+import Game.Chess.ChessFactory;
 import Game.Connect4.Connect4Factory;
 import Game.Gomoku.GomokuFactory;
 import Game.TicTacToe.TicTacToeFactory;
@@ -71,6 +72,7 @@ public class Server
 		gameMap.put("Connect4", new Connect4Factory());
 		gameMap.put("TicTacToe", new TicTacToeFactory());
 		gameMap.put("Gomuku", new GomokuFactory());
+		gameMap.put("Chess", new ChessFactory());
 	}
 
 	/**
