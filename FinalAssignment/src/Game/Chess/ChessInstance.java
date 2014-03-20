@@ -72,6 +72,7 @@ public class ChessInstance extends GameInstance{
 
 	@Override
 	public void onPlayerClick(int x, int y, Player p) {
+		getModel().clearMessages();
 		if(!isPlayersTurn(p))
 		{
 			if(isGameOver())

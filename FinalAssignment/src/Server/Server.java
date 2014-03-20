@@ -286,19 +286,6 @@ public class Server
 
 						//Start game
 						GameFactory gameFactory = this.server.gameMap.get(invite.getGame());
-
-						if(gameFactory.getClass().equals(TicTacToeFactory.class)) {
-							gameFactory = new TicTacToeFactory();
-							//ongoingGame = gameFactory.createGame(listOfPlayers);
-						}
-						else if(gameFactory.getClass().equals(Connect4Factory.class)) {
-							gameFactory = new Connect4Factory();
-							//ongoingGame = gameFactory.createGame(listOfPlayers);
-						}
-						else if(gameFactory.getClass().equals(GomokuFactory.class)) {
-							gameFactory = new GomokuFactory();
-							//ongoingGame = gameFactory.createGame(listOfPlayers);
-						}
 						
 						//Sends the model factory with a list of players
 						//Sends to both clients and starts game if accepted
