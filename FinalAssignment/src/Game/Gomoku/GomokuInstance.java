@@ -69,7 +69,7 @@ public class GomokuInstance extends XInARowGame{
 	 * @return whether or not there exists a three in a row around this location
 	 */
 	private boolean checkFiveInARow(int x, int y){
-		return countLeftSlantDiagonal(x,y)>=5||countRightSlantDiagonal(x,y)>=5||countHorizontal(x,y)>=5||countVertical(x,y)>=5;
+		return countLeftSlantDiagonal(x,y)==5||countRightSlantDiagonal(x,y)==5||countHorizontal(x,y)==5||countVertical(x,y)==5;
 	}
 
 	
