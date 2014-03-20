@@ -72,7 +72,8 @@ public class Server
 		gameMap.put("Connect4", new Connect4Factory());
 		gameMap.put("TicTacToe", new TicTacToeFactory());
 		gameMap.put("Gomuku", new GomokuFactory());
-		gameMap.put("Chess", new ChessFactory());
+		//no chess
+		//gameMap.put("Chess", new ChessFactory());
 	}
 
 	/**
