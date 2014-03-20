@@ -74,7 +74,7 @@ public class GameView
 
 	public boolean update(String[][] board, Map<String, String> state, List<Message> messages, List<String> listOfMessages) //Will be replaced w/ SimplifiedModel
 	{
-		MessageHandler.DisplayMessages(messages);
+		MessageHandler.DisplayMessages(listOfMessages);
 		
 		if(gamePanel.update(board) && scorePanel.update(state))
 		{
